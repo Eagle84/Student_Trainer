@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self';
+                   script-src 'self' https://cdn.jsdelivr.net;
+                   connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+                   style-src 'self';
+                   img-src 'self' data:;
+                   font-src 'self';
+                   base-uri 'none';
+                   object-src 'none'">
+    <title>המתרגל שלי</title>
+    <!-- Apply the saved theme before paint to avoid a flash. CSP-safe (self). -->
+    <!-- ?v=… busts GitHub Pages' ~10-min asset cache after a deploy. Bump it when
+         the stylesheet changes. Only the stylesheet and this standalone script
+         are versioned; the app.js module graph is NOT (a versioned entry loading
+         a cached sub-module would mismatch), so JS changes still rely on the
+         normal cache window. -->
+    <script src="js/theme-init.js?v=33"></script>
+    <link rel="stylesheet" href="css/styles.css?v=33">
+    <!-- HTML sanitizer (Cure53 DOMPurify), pinned + SRI. Loaded before the app
+         module so js/sanitize.js can read window.DOMPurify. -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"
+            integrity="sha384-JEyTNhjM6R1ElGoJns4U2Ln4ofPcqzSsynQkmEc/KGy6336qAZl70tDLufbkla+3"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">דלג לתוכן הראשי</a>
+
+<!-- Pull-tab for the drawer, on the edge the drawer slides out of. Desk widths
+     only: it is position:fixed, so on a phone it floats ON TOP of the cards
+     rather than beside them, and there is no width to spare for a gutter. The
+     header button below replaces it there. Shown only once signed in. -->
+<button type="button" class="drawer-handle" id="drawer-handle" data-action="open-drawer"
+        aria-label="פתח תפריט נושאים" aria-haspopup="dialog" aria-expanded="false" hidden>
+    <span class="drawer-handle-ico" aria-hidden="true">☰</span>
+    <span class="drawer-handle-text">נושאים</span>
+</button>
+
+<!-- Topic drawer. Slides in from the inline-start edge, which is the right on
+     this RTL page. Hidden from the tab order entirely while closed. -->
+<div class="drawer-scrim" id="drawer-scrim" data-action="close-drawer" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="בחירת נושא" hidden>
+    <div class="drawer-top">
+        <div>
+            <b class="drawer-title">מה עושים עכשיו?</b>
+            <small class="drawer-context" id="drawer-context"></small>
+        </div>
+        <button type="button" class="drawer-close" id="drawer-close" data-action="close-drawer"
+                aria-label="סגור את התפריט">✕</button>
+    </div>
+    <!-- Grade first, then the subjects that grade offers. -->
+    <div class="drawer-scope scope-picker" id="drawer-scope"></div>
+    <div class="drawer-body" id="drawer-body"></div>
+    <!-- Hidden at boot on anything that cannot vibrate, which is every iPhone
+         and every desktop — a switch for a capability the device does not have
+         is worse than no switch. -->
+    <button type="button" class="drawer-pref" id="haptics-toggle" data-action="toggle-haptics"
+            aria-pressed="true" hidden>
+        <span class="drawer-pref-label">רטט בתשובה נכונה</span>
+        <span class="drawer-pref-state" id="haptics-state">מופעל</span>
+    </button>
+    <!-- Filled at boot from js/config.js. Last thing in the drawer, so it is
+         out of the way but findable when someone asks "which version is this?" -->
+    <p class="drawer-foot" id="drawer-version"></p>
+</aside>
+
+<div class="container">
+    <!-- One sticky row: controls at the inline-start, the account pill at
+         the inline-end. Laid out by flex rather than by absolute offsets —
+         the theme toggle carries a text label whose width changes with the
+         label and the breakpoint, so anything placed at a fixed offset past
+         it lands on top of it. Sticky rather than absolute so it survives
+         the scroll on long screens: the header scrolls away, and it used to
+         take the Home button with it. -->
+    <div class="header-bar">
+        <div class="header-tools">
+            <button type="button" class="theme-toggle" data-action="toggle-theme"
+                    aria-pressed="false" aria-label="מעבר למצב כהה">
+                <span class="theme-toggle-icon" aria-hidden="true"></span>
+                <span class="theme-toggle-text">מצב כהה</span>
+            </button>
+            <!-- The phone-sized drawer trigger. In the flow rather than floating
+                 over the page, so it can never cover a card. Same action as the
+                 edge tab; exactly one of the two is visible at any width. -->
+            <button type="button" class="header-menu" id="header-menu" data-action="open-drawer"
+                    aria-label="פתח תפריט נושאים" aria-haspopup="dialog" aria-expanded="false" hidden>
+                <span aria-hidden="true">☰</span>
+            </button>
+            <!-- Always-available way back, on every screen except Home itself. -->
+            <button type="button" class="header-home" id="header-home" data-action="return-to-setup"
+                    aria-label="חזרה למסך הבית" hidden>
+                <span aria-hidden="true">🏠</span>
+            </button>
+            <!-- The two places that answer "how am I doing", beside Home in the
+                 sticky row so they are reachable from any screen without
+                 scrolling to the foot of one. Short labels because this row also
+                 carries the theme toggle and the logout pill, and the phone rule
+                 drops the text entirely, leaving the icon — the same treatment
+                 .theme-toggle-text already gets. The full name stays in
+                 aria-label, so a screen reader is never given "תוצאות" alone. -->
+            <button type="button" class="header-link" id="header-dashboard" data-action="show-dashboard"
+                    aria-label="הלוח האישי שלי" hidden>
+                <span aria-hidden="true">📊</span>
+                <span class="header-link-text">הלוח שלי</span>
+            </button>
+            <button type="button" class="header-link" id="header-board" data-action="show-history"
+                    aria-label="לוח התוצאות" hidden>
+                <span aria-hidden="true">🏆</span>
+                <span class="header-link-text">תוצאות</span>
+            </button>
+        </div>
+        <button type="button" class="header-logout" data-action="logout" hidden>
+            <span id="header-username"></span> · יציאה
+        </button>
+    </div>
+
+    <header>
+        <div class="brand">
+            <svg class="brand-mark" viewBox="0 0 64 64" width="52" height="52" role="img"
+                 aria-label="סמל המתרגל שלי">
+                <defs>
+                    <linearGradient id="brandGrad" x1="0" y1="1" x2="1" y2="0">
+                        <stop offset="0" stop-color="#2dd4bf"/>
+                        <stop offset="1" stop-color="#22d3ee"/>
+                    </linearGradient>
+                </defs>
+                <rect x="4" y="4" width="56" height="56" rx="16" fill="#0f2033"/>
+                <path d="M14 42 L26 30 L34 37 L50 20" fill="none" stroke="url(#brandGrad)"
+                      stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M40 20 L50 20 L50 30" fill="none" stroke="url(#brandGrad)"
+                      stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="brand-name">המתרגל שלי</span>
+        </div>
+        <p>ללמוד ולהיבחן — מתמטיקה, אנגלית ועברית מכיתה א' עד י"ב · והכנה לפסיכומטרי, לפסיכוטכני, למבחני אמינות ולמטלת הכתיבה</p>
+    </header>
+
+    <div id="banner" class="banner" role="status" aria-live="polite" hidden></div>
+
+    <main id="main-content" tabindex="-1">
+
+    <!-- Auth: register / login -->
+    <section id="auth-screen" class="screen active" aria-label="כניסה או הרשמה">
+        <div class="card card-narrow">
+            <h2>ברוך הבא ל"המתרגל שלי"</h2>
+            <div class="auth-tabs" role="tablist">
+                <button class="auth-tab active" data-action="auth-mode" data-mode="login" role="tab" aria-selected="true">כניסה</button>
+                <button class="auth-tab" data-action="auth-mode" data-mode="register" role="tab" aria-selected="false">הרשמה</button>
+            </div>
+
+            <div class="form-group">
+                <label for="auth-username">שם משתמש</label>
+                <input type="text" id="auth-username" class="form-control"
+                       autocomplete="username" maxlength="20" placeholder="אותיות באנגלית או ספרות">
+            </div>
+            <div class="form-group" id="auth-display-group" hidden>
+                <label for="auth-display">שם לתצוגה (יופיע בלוח התוצאות)</label>
+                <input type="text" id="auth-display" class="form-control"
+                       autocomplete="name" maxlength="40" placeholder="השם המלא שלך">
+            </div>
+            <div class="form-group">
+                <label for="auth-password">סיסמה</label>
+                <input type="password" id="auth-password" class="form-control"
+                       autocomplete="current-password" maxlength="72" placeholder="לפחות 6 תווים">
+            </div>
+
+            <p id="auth-error" class="auth-error" role="alert" hidden></p>
+            <button class="btn cta-btn" id="auth-submit" data-action="auth-submit">כניסה</button>
+        </div>
+    </section>
+
+    <!-- Setup -->
+    <section id="setup-screen" class="screen" aria-label="בחירת מסלול">
+        <div class="hero">
+            <h2 id="welcome-message">מה נעשה היום?</h2>
+            <p class="hero-sub">שני מסלולים, ואפשר לעבור ביניהם בכל רגע: ללמוד נושא מהתחלה, או להיבחן על מה שכבר ידוע.</p>
+        </div>
+
+        <!-- An unfinished quiz. Rendered only when one is waiting, above the two
+             paths, because picking up where you left off is the thing you came
+             back for. -->
+        <div class="resume-card" id="resume-card" hidden></div>
+
+        <div class="setup-grid">
+            <!-- Two paths, each holding its OWN settings. Nothing is configured
+                 until a path is chosen, so the screen opens as one decision
+                 rather than a form the student has to interpret. -->
+            <div class="mode-stack">
+                <article class="mode-card mode-study" id="mode-study">
+                    <button type="button" class="mode-head" data-action="pick-mode" data-mode="study"
+                            aria-expanded="false" aria-controls="mode-study-body">
+                        <span class="mode-ico" aria-hidden="true">📖</span>
+                        <span class="mode-heads">
+                            <b>ללמוד נושא</b>
+                            <small>הסבר מונחה עם דוגמאות — ואז אפשר להיבחן עליו</small>
+                        </span>
+                        <span class="mode-caret" aria-hidden="true">▾</span>
+                    </button>
+                    <div class="mode-body" id="mode-study-body" hidden>
+                        <p class="mode-when">מתאים כשהנושא חדש, או כשחוזרים על משהו שלא הסתדר.</p>
+                        <div class="scope-picker" id="setup-scope"></div>
+                        <button class="btn cta-btn" data-action="show-learn">הצג את הנושאים ←</button>
+                    </div>
+                </article>
+
+                <article class="mode-card mode-quiz" id="mode-quiz">
+                    <button type="button" class="mode-head" data-action="pick-mode" data-mode="quiz"
+                            aria-expanded="false" aria-controls="mode-quiz-body">
+                        <span class="mode-ico" aria-hidden="true">📝</span>
+                        <span class="mode-heads">
+                            <b>להיבחן</b>
+                            <small>מבחן מותאם עם משוב מיידי ופירוט טעויות</small>
+                        </span>
+                        <span class="mode-caret" aria-hidden="true">▾</span>
+                    </button>
+                    <div class="mode-body" id="mode-quiz-body" hidden>
+                        <p class="mode-when">מתאים כשרוצים לבדוק מה כבר יושב, או להתאמן לקראת מבחן בכיתה.</p>
+
+                        <div class="form-group">
+                            <span class="field-label">בחר מקצוע</span>
+                            <div id="subject-tiles" class="subject-tiles" aria-label="בחירת מקצוע"></div>
+                            <label class="sr-only" for="subject-select">מקצוע</label>
+                            <select id="subject-select" class="sr-only" data-action="change-subject" tabindex="-1" aria-hidden="true"></select>
+                        </div>
+
+                        <div class="setup-row">
+                            <div class="form-group">
+                                <label for="grade-select">כיתה</label>
+                                <select id="grade-select" class="form-control" data-action="change-grade"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="num-questions">כמות שאלות</label>
+                                <select id="num-questions" class="form-control">
+                                    <option value="10">10 שאלות</option>
+                                    <option value="20">20 שאלות</option>
+                                    <option value="50">50 שאלות</option>
+                                    <option value="100" selected>100 שאלות</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Shown only for grades 10-12 in subjects that split by יחידות. -->
+                        <div class="form-group" id="track-group" hidden>
+                            <label for="track-select">יחידות לימוד</label>
+                            <select id="track-select" class="form-control">
+                                <option value="3">3 יחידות</option>
+                                <option value="4" selected>4 יחידות</option>
+                                <option value="5">5 יחידות</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <span class="field-label">רמת קושי</span>
+                            <div id="difficulty-pills" class="level-pills" aria-label="רמת קושי">
+                                <button type="button" class="lv-pill on" data-action="pick-level" data-value="" aria-pressed="true">הכל</button>
+                                <button type="button" class="lv-pill" data-action="pick-level" data-value="1" aria-pressed="false">קל מאוד</button>
+                                <button type="button" class="lv-pill" data-action="pick-level" data-value="2" aria-pressed="false">קל</button>
+                                <button type="button" class="lv-pill" data-action="pick-level" data-value="3" aria-pressed="false">בינוני</button>
+                                <button type="button" class="lv-pill" data-action="pick-level" data-value="4" aria-pressed="false">קשה</button>
+                                <button type="button" class="lv-pill" data-action="pick-level" data-value="5" aria-pressed="false">מאתגר</button>
+                            </div>
+                            <label class="sr-only" for="difficulty-select">רמת קושי</label>
+                            <select id="difficulty-select" class="sr-only" tabindex="-1" aria-hidden="true">
+                                <option value="">כל הרמות</option>
+                                <option value="1">קל מאוד</option>
+                                <option value="2">קל</option>
+                                <option value="3">בינוני</option>
+                                <option value="4">קשה</option>
+                                <option value="5">מאתגר</option>
+                            </select>
+                        </div>
+
+                        <button class="btn cta-btn" data-action="start-quiz">התחל מבחן ←</button>
+                    </div>
+                </article>
+
+                <!-- Subjects that are not taught by school year: they are sat
+                     before an exam or a job, not in grade 11. Grouping them in
+                     their own card is what makes them findable — declaring them
+                     for grades 10-12 buried them behind a year picker. -->
+                <article class="mode-card mode-extra" id="mode-extra">
+                    <button type="button" class="mode-head" data-action="pick-mode" data-mode="extra"
+                            aria-expanded="false" aria-controls="mode-extra-body">
+                        <span class="mode-ico" aria-hidden="true">🎓</span>
+                        <span class="mode-heads">
+                            <b>מקצועות נוספים</b>
+                            <small>פסיכומטרי, פסיכוטכני, מבחני אמינות ומטלת הכתיבה — ללא קשר לכיתה</small>
+                        </span>
+                        <span class="mode-caret" aria-hidden="true">▾</span>
+                    </button>
+                    <div class="mode-body" id="mode-extra-body" hidden>
+                        <p class="mode-when">מתאים לקראת בחינת כניסה, מיון לצה"ל או מיון תעסוקתי.</p>
+
+                        <div class="form-group">
+                            <span class="field-label">בחר מקצוע</span>
+                            <div id="extra-tiles" class="subject-tiles" aria-label="בחירת מקצוע נוסף"></div>
+                        </div>
+
+                        <p class="extra-blurb" id="extra-blurb"></p>
+
+                        <div class="setup-row">
+                            <div class="form-group">
+                                <label for="extra-count">כמות שאלות</label>
+                                <select id="extra-count" class="form-control">
+                                    <option value="10">10 שאלות</option>
+                                    <option value="20" selected>20 שאלות</option>
+                                    <option value="50">50 שאלות</option>
+                                    <option value="100">100 שאלות</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="extra-difficulty">רמת קושי</label>
+                                <select id="extra-difficulty" class="form-control">
+                                    <option value="">כל הרמות</option>
+                                    <option value="1">קל מאוד</option>
+                                    <option value="2">קל</option>
+                                    <option value="3">בינוני</option>
+                                    <option value="4">קשה</option>
+                                    <option value="5">מאתגר</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="extra-actions">
+                            <button class="btn cta-btn" data-action="extra-study">ללמוד את הנושאים ←</button>
+                            <button class="btn btn-secondary" data-action="extra-quiz">להיבחן ←</button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Games. A quiz is deliberately untimed so a student can
+                     think; a sprint measures whether the answer is FLUENT.
+                     Different question, so a separate mode rather than a
+                     stopwatch bolted onto the quiz. -->
+                <article class="mode-card mode-game" id="mode-game">
+                    <button type="button" class="mode-head" data-action="pick-mode" data-mode="game"
+                            aria-expanded="false" aria-controls="mode-game-body">
+                        <span class="mode-ico" aria-hidden="true">🎮</span>
+                        <span class="mode-heads">
+                            <b>משחקים</b>
+                            <small>ספרינט של 60 שניות — כמה תספיק, ומי בראש הטבלה</small>
+                        </span>
+                        <span class="mode-caret" aria-hidden="true">▾</span>
+                    </button>
+                    <div class="mode-body" id="mode-game-body" hidden>
+                        <p class="mode-when">מתאים כשהחומר כבר מוכר ורוצים להיות מהירים בו.</p>
+
+                        <div class="form-group">
+                            <span class="field-label">בחר משחק</span>
+                            <div id="game-modes" class="game-modes" role="group" aria-label="בחירת משחק"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <span class="field-label">בחר מקצוע</span>
+                            <div id="game-tiles" class="subject-tiles" aria-label="בחירת מקצוע למשחק"></div>
+                        </div>
+
+                        <div class="setup-row">
+                            <div class="form-group">
+                                <label for="game-grade">כיתה</label>
+                                <select id="game-grade" class="form-control" data-action="change-game-grade"></select>
+                            </div>
+                            <div class="form-group" id="game-difficulty-group">
+                                <label for="game-difficulty">רמת קושי</label>
+                                <select id="game-difficulty" class="form-control">
+                                    <option value="">כל הרמות</option>
+                                    <option value="1">קל מאוד</option>
+                                    <option value="2">קל</option>
+                                    <option value="3" selected>בינוני</option>
+                                    <option value="4">קשה</option>
+                                    <option value="5">מאתגר</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <p class="game-rules" id="game-rules"></p>
+
+                        <div class="extra-actions">
+                            <button class="btn cta-btn" id="game-start" data-action="start-sprint">התחל ←</button>
+                            <button class="btn btn-secondary" data-action="show-game-board">טבלת השיאים</button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <aside class="setup-side">
+                <div class="card side-card" id="setup-progress" hidden></div>
+                <div class="card side-card" id="setup-weak" hidden></div>
+            </aside>
+        </div>
+
+    </section>
+
+    <!-- Learn: the topic catalogue. Lists every topic the subject can quiz on,
+         so a topic without a lesson yet is shown as בקרוב rather than hidden. -->
+    <section id="learn-screen" class="screen" aria-label="בחירת נושא ללמידה">
+        <div class="hero">
+            <h2>מה נלמד היום?</h2>
+            <p class="hero-sub" id="learn-sub"></p>
+        </div>
+        <!-- Grade first, then the subjects that grade offers, then its topics. -->
+        <div class="card learn-scope scope-picker" id="learn-scope"></div>
+        <div id="learn-grid" class="learn-grid"></div>
+        <div class="btn-container">
+            <button class="btn btn-secondary" data-action="return-to-setup">← למסך הבית</button>
+        </div>
+    </section>
+
+    <!-- Lesson: one card at a time. -->
+    <section id="lesson-screen" class="screen" aria-label="שיעור">
+        <div class="lesson-top">
+            <div class="lesson-heads">
+                <span class="lesson-badge" id="lesson-subject-badge"></span>
+                <h2 id="lesson-title"></h2>
+            </div>
+            <button type="button" class="lesson-close" data-action="close-lesson"
+                    aria-label="סגור את השיעור">✕</button>
+        </div>
+        <div class="lesson-dots" id="lesson-dots" role="status"></div>
+        <p class="lesson-counter" id="lesson-counter"></p>
+        <div class="lesson-page" id="lesson-card"></div>
+        <div class="lesson-footer">
+            <button class="btn btn-quiet" id="lesson-prev" data-action="lesson-prev">‹ הקודם</button>
+            <button class="btn btn-quiet" id="lesson-next" data-action="lesson-next">הבא ›</button>
+            <button class="btn cta-btn" id="lesson-quiz-btn" data-action="lesson-quiz" hidden></button>
+        </div>
+        <div class="btn-container">
+            <button class="btn btn-secondary" data-action="return-to-setup">← למסך הבית</button>
+        </div>
+    </section>
+
+    <!-- Sprint. Its own screen rather than the quiz screen with a clock added:
+         there is no "next" button (an answer advances immediately), no feedback
+         box, and the header carries a timer and a live score instead. -->
+    <section id="game-screen" class="screen" aria-label="משחק ספרינט">
+        <div class="game-hud">
+            <div class="game-stat"><b id="game-score">0</b><small>נקודות</small></div>
+            <div class="game-stat"><b id="game-clock">60</b><small>שניות</small></div>
+            <div class="game-stat"><b id="game-streak">0</b><small>רצף</small></div>
+            <div class="game-stat" id="game-extra-stat" hidden><b id="game-extra">0</b><small id="game-extra-label"></small></div>
+        </div>
+        <div class="game-timebar" id="game-timebar" role="progressbar"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="הזמן שנותר">
+            <div class="game-timefill" id="game-timefill"></div>
+        </div>
+        <!-- Announces the penalty; also the only feedback a sprint gives. -->
+        <p class="game-flash" id="game-flash" role="status" aria-live="polite"></p>
+
+        <div class="question-box" id="game-question"></div>
+        <div class="question-diagram" id="game-diagram" hidden></div>
+        <ul class="options-list" id="game-options" role="group" aria-label="אפשרויות תשובה"></ul>
+
+        <div class="btn-container">
+            <button class="btn btn-secondary" data-action="quit-game">עצור ←</button>
+        </div>
+    </section>
+
+    <!-- Sprint result + the board for exactly this subject and level. -->
+    <section id="game-over-screen" class="screen" aria-label="סיכום המשחק">
+        <div class="hero">
+            <h2 id="game-over-title">נגמר הזמן!</h2>
+            <p class="hero-sub" id="game-over-sub"></p>
+        </div>
+        <div class="card" id="game-over-stats"></div>
+        <div class="card" id="game-board-card"></div>
+        <div class="btn-container">
+            <button class="btn cta-btn" data-action="start-sprint">עוד ספרינט ←</button>
+            <button class="btn btn-secondary" data-action="return-to-setup">← למסך הבית</button>
+        </div>
+    </section>
+
+    <!-- Quiz -->
+    <section id="quiz-screen" class="screen" aria-label="מבחן">
+        <div class="quiz-header">
+            <span id="question-counter"></span>
+            <span id="topic-badge"></span>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar" role="progressbar"
+                 aria-label="התקדמות במבחן" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+        </div>
+        <!-- Reading passage, shown only for passage-based questions. -->
+        <div class="passage-box" id="passage-text" hidden></div>
+        <div class="question-box" id="question-text"></div>
+        <!-- Schematic diagram, shown only for geometry questions. -->
+        <div class="question-diagram" id="question-diagram" hidden></div>
+        <!-- Single-answer questions: one option click IS the answer. -->
+        <ul class="options-list" id="options-list" role="group" aria-label="אפשרויות תשובה"></ul>
+        <!-- Multi-part questions (cloze, choose-all, passage) render one group
+             per blank here instead, and need an explicit submit: no single click
+             means "I have finished choosing". -->
+        <div id="question-parts" hidden></div>
+        <div class="submit-row" id="submit-row" hidden>
+            <button class="btn" id="submit-answer" data-action="submit-answer" disabled>בדוק תשובה</button>
+            <span class="submit-hint" id="submit-hint"></span>
+        </div>
+        <div class="feedback-box" id="feedback-box" role="status" aria-live="polite">
+            <div class="feedback-title" id="feedback-title"></div>
+            <div id="feedback-text"></div>
+            <!-- Filled only after a wrong answer on a topic that has a lesson. -->
+            <div id="feedback-learn"></div>
+        </div>
+        <div class="quiz-footer">
+            <button class="btn btn-danger" data-action="confirm-restart">התחל מחדש</button>
+            <button class="btn" id="next-btn" data-action="next-question" hidden>לשאלה הבאה</button>
+        </div>
+    </section>
+
+    <!-- Summary -->
+    <section id="summary-screen" class="screen" aria-label="סיכום">
+        <h2>סיכום התוצאות</h2>
+        <div class="summary-card">
+            <p>שם התלמיד: <strong id="summary-student-name" class="summary-name"></strong></p>
+            <p>מקצוע: <strong id="summary-subject"></strong></p>
+            <p>ציון סופי: <strong id="final-score" class="summary-score"></strong></p>
+            <p id="save-status" class="save-status"></p>
+        </div>
+
+        <h3 id="errors-title" hidden>פירוט שגיאות ללמידה וחיזוק:</h3>
+        <div id="errors-container"></div>
+
+        <div class="btn-container">
+            <button class="btn" id="practice-weak-btn" data-action="practice-weak" hidden>חזק את הנושאים הקשים</button>
+            <button class="btn btn-secondary" data-action="return-to-setup">מבחן חדש</button>
+            <button class="btn btn-secondary" data-action="show-history">צפה בלוח התוצאות</button>
+        </div>
+    </section>
+
+    <!-- History -->
+    <section id="history-screen" class="screen" aria-label="תוצאות">
+        <h2>תוצאות</h2>
+
+        <div class="tabs" role="tablist">
+            <button class="tab active" role="tab" data-action="show-tab" data-tab="board"
+                    aria-selected="true">לוח תוצאות</button>
+            <button class="tab" role="tab" data-action="show-tab" data-tab="mine"
+                    aria-selected="false">ההיסטוריה שלי</button>
+        </div>
+
+        <div id="tab-board" class="tab-panel active" role="tabpanel">
+            <div class="form-group form-group-inline">
+                <label for="board-subject-filter">מקצוע:</label>
+                <select id="board-subject-filter" class="form-control" data-action="filter-board"></select>
+                <label for="board-grade-filter">כיתה:</label>
+                <select id="board-grade-filter" class="form-control" data-action="filter-board"></select>
+                <label for="board-difficulty-filter">רמה:</label>
+                <select id="board-difficulty-filter" class="form-control" data-action="filter-board">
+                    <option value="">הכל</option>
+                    <option value="1">1 — קל מאוד</option>
+                    <option value="2">2 — קל</option>
+                    <option value="3">3 — בינוני</option>
+                    <option value="4">4 — קשה</option>
+                    <option value="5">5 — מאתגר</option>
+                </select>
+            </div>
+            <div class="summary-card table-wrap" id="board-container"></div>
+        </div>
+
+        <div id="tab-mine" class="tab-panel" role="tabpanel">
+            <div class="summary-card table-wrap" id="mine-container"></div>
+        </div>
+
+    </section>
+
+    <!-- Dashboard -->
+    <section id="dashboard-screen" class="screen" aria-label="הלוח האישי">
+        <h2>הלוח האישי שלי</h2>
+        <p id="dashboard-greeting" class="dashboard-greeting" role="status" aria-live="polite"></p>
+        <div id="dashboard-content"></div>
+    </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <p>כל הזכויות שמורות © <span dir="ltr" lang="en">Igal Boguslavsky</span></p>
+        <p><a href="accessibility.html">הצהרת נגישות</a></p>
+    </footer>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,2247 @@
+:root {
+    --primary: #2b6cb0;
+    --primary-dark: #2c5282;
+    --secondary: #2c7a7b;
+    --danger: #c53030;
+    --danger-dark: #9b2c2c;
+    --success: #276749;
+    --bg-color: #f7fafc;
+    --card-bg: #ffffff;
+    --surface: #f8fafc;
+    --surface-alt: #edf2f7;
+    --text-color: #2d3748;
+    --muted: #4a5568;
+    --border: #cbd5e0;
+    --border-radius: 12px;
+    --transition: all 0.2s ease;
+    --touch-target: 44px;
+    /* Brand (Student Trainer) — teal→cyan. --brand-1 is teal-700 so it clears
+       4.5:1 as text on the light surfaces; the gradient still reads teal. */
+    --brand-1: #0f766e;
+    --brand-2: #0891b2;
+    --brand-3: #22d3ee;
+    --ring-track: #e2e8f0;
+    /* Button fill: teal→cyan. White bold button text clears 3:1 (large text)
+       across the whole ramp in light mode. */
+    --btn-grad: linear-gradient(90deg, #0f766e, #0891b2);
+    /* Page background wash + faint math-pattern opacity. */
+    --page-a: rgba(34, 211, 238, 0.16);
+    --page-b: rgba(13, 148, 136, 0.12);
+    --page-c1: #f4fbfb;
+    --page-c2: #eaf3fb;
+    --pattern-opacity: 0.5;
+}
+
+/* Dark theme. Surfaces and text flip; brand accents brighten for contrast.
+   All pairs verified to meet WCAG AA (4.5:1 text / 3:1 large & UI). */
+:root[data-theme="dark"] {
+    --primary: #4aa3e0;
+    --primary-dark: #2f6ea3;
+    --secondary: #2dd4bf;
+    --danger: #f87171;
+    --danger-dark: #ef4444;
+    --bg-color: #0b1622;
+    --card-bg: #0f2033;
+    --surface: #12263c;
+    --surface-alt: #14273d;
+    --text-color: #e6edf5;
+    --muted: #a7b6c8;
+    --border: #263a52;
+    --brand-1: #2dd4bf;
+    --brand-2: #22d3ee;
+    --brand-3: #22d3ee;
+    --ring-track: #1e2f45;
+    /* Dark buttons need a darker fill so white text clears contrast. */
+    --btn-grad: linear-gradient(90deg, #0e7490, #2563eb);
+    --page-a: rgba(34, 211, 238, 0.10);
+    --page-b: rgba(13, 148, 136, 0.10);
+    --page-c1: #0b1622;
+    --page-c2: #0e1c2c;
+    --pattern-opacity: 0.6;
+}
+
+/* One knob for the whole type scale.
+ *
+ * Every font-size in this file is in rem, so 93.75% of the browser's 16px puts
+ * the base at 15px and shrinks all of them together — no 138-declaration sweep,
+ * and nothing drifts out of proportion later.
+ *
+ * A percentage rather than a px value on purpose: it scales FROM whatever the
+ * reader has set, so someone who raised their browser's default font still gets
+ * their larger text. Hard-coding 15px would silently override that.
+ *
+ * Spacing is a separate concern — those are px and were scaled directly. */
+html { font-size: 93.75%; }
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+    margin: 0;
+    padding: 13px;
+    direction: rtl;
+    min-height: 100vh;
+    -webkit-text-size-adjust: 100%;
+    background:
+        radial-gradient(1100px 560px at 90% -8%, var(--page-a), transparent 60%),
+        radial-gradient(900px 460px at -8% 18%, var(--page-b), transparent 55%),
+        linear-gradient(180deg, var(--page-c1), var(--page-c2));
+    background-attachment: fixed;
+}
+
+/* Faint math-symbol texture behind the content. CSP-safe inline-SVG data URI —
+   no external image. Sits below the container, showing through the page margins. */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: var(--pattern-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%230d9488' stroke-opacity='0.10' stroke-width='2'%3E%3Ctext x='16' y='36' font-family='monospace' font-size='26' fill='%230d9488' fill-opacity='0.09' stroke='none'%3E%2B%3C/text%3E%3Ctext x='92' y='60' font-family='monospace' font-size='24' fill='%230891b2' fill-opacity='0.09' stroke='none'%3E%D7%97%3C/text%3E%3Ctext x='40' y='104' font-family='monospace' font-size='24' fill='%237c3aed' fill-opacity='0.09' stroke='none'%3EA%3C/text%3E%3Ctext x='108' y='120' font-family='monospace' font-size='26' fill='%230d9488' fill-opacity='0.09' stroke='none'%3E%C3%97%3C/text%3E%3Ccircle cx='120' cy='28' r='9'/%3E%3Cpath d='M12 70 h20 M22 60 v20'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 24px 50px -24px rgba(15, 32, 51, 0.28);
+    padding: 26px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 21px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 17px;
+}
+header h1 { color: var(--primary); margin-bottom: 8px; font-size: 2rem; }
+header p { color: var(--muted); font-size: 1rem; margin: 0; }
+
+.sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Skip link: off-screen until focused. Logical `inset-inline-start` (not a
+   physical left/right) so it stays correct under RTL. */
+.skip-link {
+    position: absolute;
+    inset-inline-start: 8px;
+    top: -48px;
+    z-index: 1000;
+    background: var(--primary);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: top 0.15s ease;
+}
+.skip-link:focus { top: 8px; }
+
+/* The main region is a focus target on screen changes but is not itself
+   interactive, so it needs no visible ring. */
+#main-content:focus { outline: none; }
+
+/* --- footer ------------------------------------------------------- */
+.site-footer {
+    margin-top: 26px;
+    padding-top: 17px;
+    border-top: 2px solid #e2e8f0;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+.site-footer p { margin: 4px 0; }
+.site-footer a { color: var(--primary-dark); font-weight: bold; }
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* --- banner ------------------------------------------------------- */
+.banner {
+    background: #fffaf0;
+    border: 1px solid #f6ad55;
+    color: #7b341e;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 17px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+.banner[hidden] { display: none; }
+
+/* --- cards and forms ---------------------------------------------- */
+.card {
+    position: relative;
+    background: #ebf8ff;
+    border: 1px solid #bee3f8;
+    border-radius: 16px;
+    padding: 21px;
+    margin-bottom: 17px;
+    line-height: 1.6;
+    overflow: hidden;
+}
+/* Brand accent bar across the top of every card. */
+.card::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--brand-1), var(--brand-2), var(--brand-3));
+}
+.card-narrow { text-align: center; max-width: 420px; margin: 0 auto 17px; }
+.card h2 { color: var(--primary); margin-top: 0; }
+
+.form-group { margin-bottom: 17px; }
+.form-group:last-child { margin-bottom: 0; }
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 7px;
+    color: var(--primary-dark);
+}
+.form-group-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.form-group-inline label { margin-bottom: 0; white-space: nowrap; }
+.form-group-inline .form-control { width: auto; flex: 1; min-width: 160px; }
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    min-height: var(--touch-target);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fff;
+    color: var(--text-color);
+    font-family: inherit;
+}
+.form-control:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+    border-color: var(--primary);
+}
+.input-centered { text-align: center; font-size: 1.2rem; }
+
+/* --- buttons ------------------------------------------------------ */
+.btn {
+    background: var(--btn-grad);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    min-height: var(--touch-target);
+    font-size: 1.1rem;
+    font-family: inherit;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 12px 24px -12px rgba(8, 145, 178, 0.65);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 18px 32px -12px rgba(8, 145, 178, 0.8); }
+.btn:focus-visible { outline: 3px solid var(--primary-dark); outline-offset: 2px; }
+.btn[hidden] { display: none; }
+.btn-secondary { background: var(--secondary); box-shadow: 0 12px 24px -14px rgba(44, 122, 123, 0.6); }
+.btn-secondary:hover { background: var(--secondary); }
+.btn-danger { background: var(--danger); box-shadow: 0 12px 24px -14px rgba(197, 48, 48, 0.5); }
+.btn-danger:hover { background: var(--danger); }
+
+.btn-container {
+    display: flex;
+    justify-content: center;
+    gap: 13px;
+    flex-wrap: wrap;
+    margin-top: 17px;
+}
+
+
+/* --- quiz --------------------------------------------------------- */
+.quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 17px;
+    background: #edf2f7;
+    padding: 10px 13px;
+    border-radius: 8px;
+    font-weight: bold;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.progress-bar-container {
+    background: #e2e8f0;
+    border-radius: 10px;
+    height: 10px;
+    width: 100%;
+    margin-bottom: 21px;
+    overflow: hidden;
+}
+.progress-bar {
+    background: var(--primary);
+    height: 100%;
+    width: 0;
+    transition: width 0.3s ease;
+}
+
+.question-box {
+    font-size: 1.3rem;
+    margin-bottom: 21px;
+    line-height: 1.8;
+    font-weight: 600;
+    text-align: start;
+}
+
+.options-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 21px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+.option-item {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 13px 17px;
+    min-height: var(--touch-target);
+    cursor: pointer;
+    font-size: 1.2rem;
+    text-align: start;
+    display: flex;
+    align-items: center;
+    transition: var(--transition);
+}
+/* Exam formats: a reading passage, one group per blank, and the submit row. */
+.passage-box {
+    background: #f7fafc;
+    border: 2px solid var(--border);
+    border-inline-start: 5px solid var(--primary);
+    border-radius: 8px;
+    padding: 14px 15px;
+    margin-bottom: 14px;
+    line-height: 1.8;
+}
+.part-group {
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+}
+.part-prompt { font-weight: bold; margin: 0 0 7px; color: var(--primary-dark); }
+.part-number {
+    display: inline-block;
+    min-width: 1.6em;
+    text-align: center;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 50%;
+    margin-inline-end: 5px;
+}
+.part-hint { margin: 0 0 7px; font-size: 0.9rem; color: var(--muted); }
+/* Multi-part questions need an explicit submit: no single click means "I have
+   finished choosing" when there are several blanks. */
+.submit-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 17px; }
+.submit-row[hidden] { display: none; }
+.submit-hint { color: var(--muted); font-size: 0.9rem; }
+#submit-answer:disabled { opacity: 0.55; cursor: default; }
+#question-parts[hidden] { display: none; }
+.quiz-submit { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.submit-hint { font-size: 0.9rem; color: var(--muted); }
+/* Selected but not yet submitted — distinct from the correct/incorrect states,
+   which only appear after grading. */
+.option-item.selected {
+    border-color: var(--primary);
+    background: #ebf4ff;
+    font-weight: bold;
+}
+.option-item:hover { border-color: var(--primary); background: #f7fafc; }
+.option-item:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.option-item.correct {
+    border-color: #38a169;
+    background: #f0fff4;
+    color: #22543d;
+    font-weight: bold;
+}
+.option-item.incorrect { border-color: var(--danger); background: #fff5f5; color: #742a2a; }
+.option-item.locked { cursor: default; }
+.option-item.locked:hover { border-color: #e2e8f0; background: #fff; }
+.option-item.locked.correct:hover { border-color: #38a169; background: #f0fff4; }
+.option-item.locked.incorrect:hover { border-color: var(--danger); background: #fff5f5; }
+
+.feedback-box {
+    background: #fffaf0;
+    border: 1px solid #feebc8;
+    border-radius: 8px;
+    padding: 17px;
+    margin-bottom: 17px;
+    display: none;
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+.feedback-box.show { display: block; }
+.feedback-box.correct-fb { background: #f0fff4; border-color: #9ae6b4; color: #22543d; }
+.feedback-box.incorrect-fb { background: #fff5f5; border-color: #feb2b2; color: #742a2a; }
+.feedback-box.partial-fb { background: #fffaf0; border-color: #fbd38d; color: #7b341e; }
+.feedback-title { font-weight: bold; margin-bottom: 7px; }
+
+.quiz-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 17px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* --- summary ------------------------------------------------------ */
+.summary-card {
+    background: #f8fafc;
+    border-radius: var(--border-radius);
+    padding: 17px;
+    margin-bottom: 17px;
+    border: 1px solid #e2e8f0;
+}
+.summary-name { font-size: 1.2rem; }
+.summary-score { font-size: 1.5rem; color: var(--primary); }
+.save-status { color: var(--muted); font-size: 0.95rem; margin-bottom: 0; }
+
+.error-item {
+    background: #fff;
+    border-right: 4px solid var(--danger);
+    padding: 13px;
+    margin-bottom: 13px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    line-height: 1.7;
+}
+.error-item p { margin: 0 0 7px; }
+.error-item p:last-child { margin-bottom: 0; }
+.error-wrong { color: var(--danger); }
+
+.empty-state { text-align: center; font-size: 1.1rem; color: var(--muted); padding: 17px; }
+
+/* --- tabs --------------------------------------------------------- */
+.tabs {
+    display: flex;
+    gap: 7px;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 17px;
+    flex-wrap: wrap;
+}
+.tab {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 10px 15px;
+    min-height: var(--touch-target);
+    font-size: 1.05rem;
+    font-family: inherit;
+    font-weight: bold;
+    color: var(--muted);
+    cursor: pointer;
+    transition: var(--transition);
+}
+.tab:hover { color: var(--primary); }
+.tab:focus-visible { outline: 3px solid var(--primary); outline-offset: -3px; }
+.tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* --- tables ------------------------------------------------------- */
+.table-wrap { overflow-x: auto; }
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0;
+    background: #fff;
+}
+.history-table th,
+.history-table td {
+    border: 1px solid #e2e8f0;
+    padding: 10px;
+    text-align: center;
+}
+.history-table th {
+    background-color: #edf2f7;
+    color: var(--primary-dark);
+    font-weight: bold;
+    white-space: nowrap;
+}
+.history-table tr:nth-child(even) { background-color: #f7fafc; }
+.rank-cell { font-weight: bold; color: var(--primary); width: 3rem; font-size: 1.1rem; }
+
+.expand-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    min-height: 36px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--primary-dark);
+    cursor: pointer;
+}
+.expand-btn:hover { background: #edf2f7; }
+.drill-btn { margin-inline-start: 5px; border-color: var(--brand-1); color: var(--brand-1); }
+:root[data-theme="dark"] .drill-btn { color: #7dc4f0; border-color: #7dc4f0; }
+.error-detail-cell { background: #fff; text-align: right; padding: 0; }
+.error-detail-cell > div { padding: 13px; }
+
+/* --- math --------------------------------------------------------- */
+.math-inline {
+    font-weight: bold;
+    color: var(--primary-dark);
+    font-family: 'Courier New', Courier, monospace;
+    display: inline-block;
+}
+.math-frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 5px;
+    line-height: 1;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: var(--primary-dark);
+}
+.math-frac .top { border-bottom: 2px solid currentColor; padding: 0 4px 2px; }
+.math-frac .bottom { padding: 2px 4px 0; }
+
+/* --- responsive --------------------------------------------------- */
+@media (max-width: 600px) {
+    body { padding: 0; }
+    .container { padding: 13px; margin: 0; border-radius: 0; box-shadow: none; }
+    header h1 { font-size: 1.5rem; }
+    header p { font-size: 0.9rem; }
+    .btn { width: 100%; padding: 13px; }
+    .btn-container { flex-direction: column; gap: 8px; }
+    /* Side by side on a phone, against the full-width rule above. Stacked, this
+       bar is permanently on screen and two full-height buttons would take a
+       third of a small viewport away from the board they sit on top of. */
+    .quiz-footer { flex-direction: column-reverse; }
+    .quiz-footer .btn { width: 100%; }
+    .quiz-header { flex-direction: column; align-items: flex-start; }
+    .option-item { font-size: 1.1rem; padding: 12px 13px; }
+    .question-box { font-size: 1.15rem; }
+    .history-table th,
+    .history-table td { padding: 7px 5px; font-size: 0.85rem; }
+    .card { padding: 15px; }
+    .tab { padding: 8px 10px; font-size: 0.95rem; }
+}
+
+@media (min-width: 601px) {
+    .options-list { grid-template-columns: 1fr 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+}
+
+/* --- bidirectional text ------------------------------------------- */
+/* Mathematical notation reads left-to-right in EVERY language. `direction`
+   alone is not enough: without `unicode-bidi: isolate` the span still takes
+   part in the surrounding bidi run, so it can reorder the text around it and
+   be reordered by it. Isolation makes each span an opaque neutral object, so
+   a formula renders correctly inside Hebrew prose, English prose, or any
+   future subject. This is a correctness fix, not cosmetics — an unisolated
+   "x1=3, x2=-2" displays with the comma and minus relocated, showing the
+   student a different expression than the one being scored. */
+.math-inline,
+.math-frac {
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+/* A whole expression (fractions + operators) as ONE left-to-right unit, so a
+   non-commutative problem like "a ÷ b" is not reversed to "b ÷ a" by the RTL
+   flow of the surrounding question text. */
+.math-expr {
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+/* English fragments embedded in Hebrew prose, and vice versa. */
+.lang-ltr {
+    display: inline-block;
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+/* Direction is set by ui.applySubjectDirection() from SUBJECTS[id].dir (prose)
+   and SUBJECTS[id].optionsDir (answers), as a dir attribute on #question-text
+   and #options-list — and, when the subject uses 'auto', on each .option-item
+   individually so a mixed Hebrew/English list resolves per item.
+
+   .question-box and .option-item use `text-align: start`, which follows
+   whatever direction the element resolved to. That is what makes 'auto' work:
+   a physical `left`/`right` would have to be overridden per case, and there is
+   no selector that can match "this element resolved to RTL". */
+#options-list[dir="ltr"] {
+    direction: ltr;
+}
+
+/* --- brand + theme toggle ---------------------------------------- */
+header { position: relative; }
+
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+.brand-mark { flex: 0 0 auto; }
+.brand-name {
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: var(--brand-1); /* fallback if background-clip unsupported */
+    background: linear-gradient(90deg, var(--brand-1), var(--brand-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Sticky, not absolute. The header is in normal flow, so on a long screen —
+   the dashboard, the board, the topic catalogue — it scrolled away and took
+   Home with it, leaving the only way back at the very bottom of the page.
+   Sticky keeps the cluster at the top of the viewport for the whole scroll
+   without any dependence on the container's width or centring, which a
+   `position: fixed` inset would have had to compute.
+   The row itself is transparent; each control carries its own opaque pill, so
+   content scrolling beneath stays readable between them. */
+.header-bar {
+    position: sticky; top: 10px;
+    z-index: 35;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px;
+    min-height: 40px;
+}
+.header-tools { display: flex; align-items: center; gap: 7px; }
+
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    /* background-color, not the `background` shorthand.
+       These header controls carry `transition: all`, and a shorthand whose
+       value is a var() is a pending substitution that Chrome will not
+       interpolate — so when data-theme flips, the transition never commits and
+       the control keeps its old colour. The theme toggle itself stayed white on
+       a dark page, which is as visible as this class of bug gets. The longhand
+       transitions normally. Same change on .header-home and .header-link. */
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-color);
+    border-radius: 999px;
+    padding: 7px 12px;
+    min-height: 40px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    /* border-color and colour only — never a background transition.
+       These controls take their background from var(--surface), and a
+       transition on a property whose value is a pending var() substitution is
+       one Chrome will not interpolate: when data-theme flips, the transition
+       never commits and the control keeps the previous theme's colour. The
+       theme toggle itself stayed white on a dark page. Nothing here needs its
+       background animated, so the shorthand goes. */
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+.theme-toggle:hover { border-color: var(--primary); }
+.theme-toggle:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.theme-toggle-icon {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, var(--brand-1), var(--brand-2));
+}
+
+/* --- dashboard --------------------------------------------------- */
+.dashboard-greeting { font-size: 1.15rem; color: var(--muted); margin: 0 0 17px; }
+
+.dash-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 19px;
+    margin-bottom: 17px;
+}
+.dash-card h3 { margin: 0 0 14px; color: var(--primary); }
+.dash-card h4 { margin: 0 0 8px; color: var(--text-color); font-size: 1rem; }
+/* How the card's numbers were computed. Sits under the title, before the data,
+   because a reader needs the method before the figure — not as a footnote. */
+.dash-note {
+    margin: -8px 0 14px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--muted);
+}
+.dash-sub { margin: 16px 0 8px; font-size: 0.95rem; color: var(--text-color); }
+
+.overview-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.ring { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; }
+.ring-label { fill: var(--text-color); font-size: 1.6rem; font-weight: 800; }
+.ring-caption {
+    margin-top: 2px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-align: center;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    gap: 10px;
+    flex: 1;
+    min-width: 240px;
+}
+.stat-tile {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+}
+.stat-value { font-size: 1.7rem; font-weight: 800; color: var(--brand-1); direction: ltr; }
+.stat-label { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+/* The method behind the tile, when the number alone would be ambiguous. */
+.stat-note { font-size: 0.72rem; color: var(--muted); margin-top: 3px; opacity: 0.85; line-height: 1.35; }
+
+/* Per-subject progress: name, sparkline, direction. */
+.trend-row {
+    display: grid;
+    grid-template-columns: 6rem 1fr auto;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.trend-row:last-child { margin-bottom: 0; }
+.spark { display: flex; align-items: flex-end; gap: 3px; height: 46px; }
+.spark-bar {
+    flex: 1;
+    min-width: 3px;
+    background: linear-gradient(180deg, var(--brand-2), var(--brand-1));
+    border-radius: 3px 3px 0 0;
+}
+.spark-bar.low { background: linear-gradient(180deg, #f0a17d, #e2725b); }
+.trend-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.trend-meta small { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
+.delta { font-weight: 700; font-size: 0.9rem; white-space: nowrap; }
+.delta-up { color: #2f855a; }
+.delta-down { color: #c53030; }
+.delta-flat, .delta-none { color: var(--muted); font-weight: 600; font-size: 0.82rem; }
+
+/* Mastery table: the two ends of the scale, so a weak topic is findable at a
+   glance in a table of twenty rows. */
+.cell-weak { color: #c53030; font-weight: 700; }
+.cell-strong { color: #2f855a; font-weight: 700; }
+
+:root[data-theme="dark"] .delta-up, :root[data-theme="dark"] .cell-strong { color: #6ee7b7; }
+:root[data-theme="dark"] .delta-down, :root[data-theme="dark"] .cell-weak { color: #fca5a5; }
+
+.subj-row {
+    display: grid;
+    grid-template-columns: 6rem 1fr auto;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.subj-row:last-child { margin-bottom: 0; }
+.subj-name { font-weight: bold; }
+.subj-val { font-size: 0.85rem; color: var(--muted); white-space: nowrap; direction: rtl; }
+.meter {
+    background: var(--ring-track);
+    border-radius: 8px;
+    height: 12px;
+    overflow: hidden;
+}
+.meter-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand-1), var(--brand-2));
+    border-radius: 8px;
+}
+
+.trend { padding-top: 7px; }
+.trend-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    direction: ltr; /* time flows left→right */
+}
+/* Value above, bar in a fixed-height track so every bar shares one baseline,
+   date below. Without the track the columns would each size themselves and the
+   bars would no longer be comparable. */
+.trend-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.trend-track { width: 100%; height: 110px; display: flex; align-items: flex-end; }
+.trend-bar {
+    width: 100%;
+    background: linear-gradient(180deg, var(--brand-2), var(--brand-1));
+    border-radius: 4px 4px 0 0;
+}
+/* A failing attempt reads as such at a glance rather than only by its number. */
+.trend-bar.low { background: linear-gradient(180deg, #fbbf24, #f87171); }
+.trend-val { font-size: 0.72rem; font-weight: bold; color: var(--text-color); line-height: 1; }
+.trend-date { font-size: 0.65rem; color: var(--muted); line-height: 1; white-space: nowrap; }
+
+@media (max-width: 640px) {
+    /* Twelve columns on a phone leave about 26px each — enough for "85%" but
+       not for a date under it as well. The percentages are the point, so the
+       dates step aside rather than overlapping into an unreadable smear. */
+    .trend-date { display: none; }
+    .trend-val { font-size: 0.66rem; }
+    .trend-bars { gap: 4px; }
+    .trend-track { height: 92px; }
+}
+
+/* Insights: a responsive grid of small findings. auto-fit rather than a fixed
+   column count, because the number of tiles varies — a tile is omitted whenever
+   its figure cannot be computed honestly. */
+.insight-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+.insight {
+    display: flex; flex-direction: column; gap: 2px;
+    padding: 12px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    min-width: 0;
+}
+.insight-val { font-size: 1.5rem; font-weight: 800; color: var(--brand-1); line-height: 1.1; }
+.insight.good .insight-val { color: #16a34a; }
+.insight.bad  .insight-val { color: var(--danger); }
+.insight-label { font-size: 0.9rem; font-weight: bold; color: var(--text-color); }
+.insight-note { color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
+:root[data-theme="dark"] .insight { background: #0f2033; }
+:root[data-theme="dark"] .insight.good .insight-val { color: #4ade80; }
+
+/* A failing average is coloured, so the ceiling is visible without reading. */
+.meter-fill.low { background: linear-gradient(90deg, #fbbf24, #f87171); }
+
+/* A flawless attempt says so instead of offering an empty error drawer. */
+.all-correct { color: #16a34a; font-weight: bold; font-size: 0.9rem; white-space: nowrap; }
+:root[data-theme="dark"] .all-correct { color: #4ade80; }
+
+.sw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.sw-box { min-width: 0; }
+.sw-empty { color: var(--muted); margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip {
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border: 1px solid transparent;
+}
+.chip-strong { background: #e6fffa; color: #1d6f66; border-color: #99e6dc; }
+/* A topic to work on, not an error state. The old pale-red fill with a red
+   border read as a validation failure — six of them stacked in the side panel
+   looked like a page of complaints. The surface is neutral and only the count
+   badge carries the warm colour, which is enough to rank them at a glance. */
+.chip-weak {
+    background-color: var(--surface);
+    color: var(--text-color);
+    border-color: var(--border);
+}
+/* Weak-topic chips are buttons: click one to drill that topic. */
+/* A chip is a real tap target on a phone, so it gets the 44px floor the rest of
+   the controls have. It sat just under it before the type and spacing came
+   down, and shrinking the page must not shrink what a thumb has to hit. */
+.chip-btn {
+    display: inline-flex; align-items: center; justify-content: space-between; gap: 8px;
+    cursor: pointer; font-family: inherit;
+    min-height: var(--touch-target);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.chip-topic { text-align: start; }
+/* How many times it has been missed. A badge rather than "(5)": the number is
+   the ranking, and parentheses inside the label made it read as part of the
+   topic's name. */
+.chip-count {
+    flex: 0 0 auto;
+    min-width: 1.55rem;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: #fed7d7;
+    color: #9b2c2c;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-align: center;
+}
+.chip-btn:hover { border-color: var(--primary); background-color: var(--surface-alt); }
+.chip-btn:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+.activity-list { list-style: none; padding: 0; margin: 0; }
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-label { font-weight: bold; }
+.activity-date { color: var(--muted); font-size: 0.85rem; margin-inline-start: auto; }
+.activity-meta { font-weight: 800; color: var(--brand-1); }
+
+@media (max-width: 600px) {
+    .sw-grid { grid-template-columns: 1fr; }
+    .brand-name { font-size: 1.5rem; }
+    .theme-toggle-text { display: none; }
+    /* Icon only, like the theme toggle: five controls with labels do not fit a
+       phone's header row, and the accessible name is on the button itself. */
+    .header-link-text { display: none; }
+    .header-link { padding: 7px; width: 40px; justify-content: center; }
+    .theme-toggle { padding: 7px; }
+}
+
+/* --- dark-theme component overrides ------------------------------ */
+/* Components with hard-coded light backgrounds need explicit dark values. */
+:root[data-theme="dark"] header { border-bottom-color: var(--border); }
+:root[data-theme="dark"] .card { background: #12263c; border-color: var(--border); }
+:root[data-theme="dark"] .form-control { background: #0c1c2e; color: var(--text-color); border-color: #31465f; }
+:root[data-theme="dark"] .quiz-header { background: #14273d; }
+:root[data-theme="dark"] .progress-bar-container { background: var(--ring-track); }
+:root[data-theme="dark"] .option-item { background: #0f2033; border-color: #263a52; }
+:root[data-theme="dark"] .option-item:hover { background: #14273d; }
+:root[data-theme="dark"] .option-item.locked:hover { background: #0f2033; }
+:root[data-theme="dark"] .option-item.correct,
+:root[data-theme="dark"] .option-item.locked.correct:hover { background: #0f2e22; border-color: #2f855a; color: #9ae6b4; }
+:root[data-theme="dark"] .option-item.incorrect,
+:root[data-theme="dark"] .option-item.locked.incorrect:hover { background: #3a1a1a; border-color: #c53030; color: #feb2b2; }
+:root[data-theme="dark"] .feedback-box { background: #14273d; border-color: #31465f; }
+:root[data-theme="dark"] .feedback-box.correct-fb { background: #0f2e22; border-color: #2f855a; color: #c6f6d5; }
+:root[data-theme="dark"] .feedback-box.incorrect-fb { background: #3a1a1a; border-color: #c53030; color: #fed7d7; }
+:root[data-theme="dark"] .banner { background: #3a2e12; border-color: #7a5b1e; color: #fbe4a0; }
+:root[data-theme="dark"] .summary-card { background: #12263c; border-color: var(--border); }
+:root[data-theme="dark"] .error-item { background: #12263c; }
+:root[data-theme="dark"] .history-table { background: #0f2033; }
+:root[data-theme="dark"] .history-table th { background: #14273d; color: var(--text-color); }
+:root[data-theme="dark"] .history-table td,
+:root[data-theme="dark"] .history-table th { border-color: var(--border); }
+:root[data-theme="dark"] .history-table tr:nth-child(even) { background: #12263c; }
+:root[data-theme="dark"] .stat-tile { background: #0c1c2e; }
+:root[data-theme="dark"] .chip-strong { background: #0f2e22; color: #9ae6b4; border-color: #2f855a; }
+:root[data-theme="dark"] .chip-count { background: #4a1d1d; color: #feb2b2; }
+:root[data-theme="dark"] .expand-btn { color: var(--text-color); border-color: var(--border); }
+:root[data-theme="dark"] .expand-btn:hover { background: #14273d; }
+/* Text colours that must be light on the dark surface to clear 4.5:1. */
+:root[data-theme="dark"] .form-group label { color: #cfe0f5; }
+:root[data-theme="dark"] .tab { color: #cbd5e0; }
+:root[data-theme="dark"] .tab.active { color: #7dc4f0; border-bottom-color: #7dc4f0; }
+:root[data-theme="dark"] .card h2,
+:root[data-theme="dark"] .dash-card h3 { color: #7dc4f0; }
+/* Filled buttons carry WHITE text, so their dark-theme background must be dark
+   enough to clear 4.5:1 with white — the opposite of the light accent colours. */
+:root[data-theme="dark"] .btn { background-color: #2563eb; }
+:root[data-theme="dark"] .btn:hover { background-color: #1d4ed8; }
+:root[data-theme="dark"] .btn-secondary { background-color: #0f766e; }
+:root[data-theme="dark"] .btn-secondary:hover { background-color: #115e56; }
+:root[data-theme="dark"] .btn-danger { background-color: #dc2626; }
+:root[data-theme="dark"] .btn-danger:hover { background-color: #b91c1c; }
+:root[data-theme="dark"] .skip-link { background: #2563eb; }
+:root[data-theme="dark"] .site-footer a { color: #7dc4f0; }
+
+/* --- setup screen redesign (hero + tiles + pills + side panel) ------ */
+.hero { margin: 2px 4px 17px; }
+.hero h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); line-height: 1.25; margin: 0; }
+.hero-sub { color: var(--muted); margin-top: 5px; font-size: 1.02rem; }
+
+.setup-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 17px; align-items: start; }
+@media (max-width: 760px) { .setup-grid { grid-template-columns: 1fr; } }
+
+.card.setup-main { background: var(--card-bg); }
+.field-label { display: block; font-weight: bold; margin: 0 2px 8px; color: var(--primary-dark); }
+.setup-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.setup-row .form-group { flex: 1; min-width: 150px; }
+
+.subject-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.subject-tile {
+    border: 2px solid var(--border); border-radius: 14px; padding: 12px 8px; text-align: center;
+    cursor: pointer; background: var(--card-bg); color: var(--text-color); font-family: inherit;
+    transition: var(--transition); min-height: var(--touch-target);
+}
+.subject-tile .tile-ico {
+    width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center;
+    margin: 0 auto 7px; font-size: 1.3rem; color: #fff;
+}
+.subject-tile b { display: block; font-size: 0.98rem; }
+.subject-tile small { display: block; color: var(--muted); font-size: 0.75rem; margin-top: 2px; }
+.subject-tile.math .tile-ico { background: linear-gradient(135deg, #0d9488, #14b8a6); }
+.subject-tile.english .tile-ico { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+.subject-tile.hebrew .tile-ico { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+.subject-tile[aria-pressed="true"] {
+    border-color: var(--brand-1); box-shadow: 0 12px 26px -16px rgba(13, 148, 136, 0.7); transform: translateY(-2px);
+}
+.subject-tile:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+.level-pills { display: flex; flex-wrap: wrap; gap: 7px; }
+.lv-pill {
+    border: 2px solid var(--border); border-radius: 999px; padding: 8px 13px; font-weight: bold;
+    font-size: 0.9rem; cursor: pointer; background: var(--card-bg); color: var(--muted);
+    font-family: inherit; transition: var(--transition); min-height: 40px;
+}
+.lv-pill:hover { border-color: var(--brand-1); color: var(--text-color); }
+.lv-pill:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.lv-pill.on {
+    color: #fff; border-color: transparent; background: var(--btn-grad);
+    box-shadow: 0 10px 20px -12px rgba(8, 145, 178, 0.7);
+}
+
+.cta-btn { width: 100%; margin-top: 7px; font-size: 1.15rem; padding: 13px; }
+
+.setup-side { display: flex; flex-direction: column; gap: 17px; }
+.card.side-card { background: var(--card-bg); padding: 17px; text-align: center; }
+.side-card h3 { margin: 0 0 10px; color: var(--primary); font-size: 1.05rem; }
+.side-ring { width: 120px; height: 120px; margin: 0 auto 8px; }
+.side-ring text { fill: var(--text-color); }
+.side-stats { display: flex; gap: 7px; }
+.side-stat { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 8px; }
+.side-stat b { display: block; font-size: 1.3rem; color: var(--brand-1); }
+.side-stat small { color: var(--muted); font-size: 0.72rem; }
+.side-weak-chips { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; }
+:root[data-theme="dark"] .field-label { color: #cfe0f5; }
+
+/* --- auth (register / login) --------------------------------------- */
+.auth-tabs { display: flex; gap: 7px; margin: 4px 0 15px; border-bottom: 2px solid var(--border); }
+.auth-tab {
+    flex: 1; background: none; border: none; border-bottom: 3px solid transparent;
+    padding: 8px; font-family: inherit; font-size: 1rem; font-weight: bold;
+    color: var(--muted); cursor: pointer;
+}
+.auth-tab:hover { color: var(--primary); }
+.auth-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.auth-tab:focus-visible { outline: 3px solid var(--primary); outline-offset: -3px; }
+.auth-error { color: var(--danger); font-weight: bold; margin: 0 0 10px; }
+.auth-error[hidden] { display: none; }
+
+.header-logout {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-color);
+    border-radius: 999px; padding: 7px 12px; min-height: 40px;
+    font-family: inherit; font-size: 0.85rem; font-weight: bold; cursor: pointer;
+}
+.header-logout:hover { border-color: var(--primary); }
+.header-logout:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.header-logout[hidden] { display: none; }
+
+/* The phone drawer trigger. Sits beside the theme toggle at the same edge the
+   drawer slides from, so the gesture still points the right way. Hidden above
+   the phone breakpoint, where the edge tab takes over. */
+.header-menu {
+    display: none; align-items: center; justify-content: center;
+    width: 40px; height: 40px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--brand-1);
+    border-radius: 999px;
+    font-family: inherit; font-size: 1.1rem; cursor: pointer;
+    /* border-color and colour only — never a background transition.
+       These controls take their background from var(--surface), and a
+       transition on a property whose value is a pending var() substitution is
+       one Chrome will not interpolate: when data-theme flips, the transition
+       never commits and the control keeps the previous theme's colour. The
+       theme toggle itself stayed white on a dark page. Nothing here needs its
+       background animated, so the shorthand goes. */
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+.header-menu:hover { border-color: var(--primary); }
+.header-menu:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.header-menu[hidden] { display: none; }
+
+/* Home. Sits beside the theme toggle at desk widths, where .header-menu is
+   hidden and its slot is free; the phone rule below shifts it past the menu. */
+.header-home {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px;
+    /* Longhand, so the theme flip commits. See .theme-toggle. */
+    background-color: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: inherit; font-size: 1.05rem; cursor: pointer;
+    /* border-color and colour only — never a background transition.
+       These controls take their background from var(--surface), and a
+       transition on a property whose value is a pending var() substitution is
+       one Chrome will not interpolate: when data-theme flips, the transition
+       never commits and the control keeps the previous theme's colour. The
+       theme toggle itself stayed white on a dark page. Nothing here needs its
+       background animated, so the shorthand goes. */
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+.header-home:hover { border-color: var(--primary); }
+.header-home:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.header-home[hidden] { display: none; }
+
+/* The board and dashboard links. Same pill as .header-logout — icon, short
+   label, 999px, 40px tall — so the row reads as one set of controls rather than
+   as the header's buttons plus two imports. The icon is a separate span from
+   the text because the phone rule drops the text and keeps the icon. */
+.header-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    /* Longhand, so the theme flip commits. See .theme-toggle. */
+    background-color: var(--surface); border: 1px solid var(--border); color: var(--text-color);
+    border-radius: 999px; padding: 7px 12px; min-height: 40px;
+    font-family: inherit; font-size: 0.85rem; font-weight: bold; cursor: pointer;
+    white-space: nowrap;
+    /* border-color and colour only. See .theme-toggle. */
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+.header-link:hover { border-color: var(--primary); }
+.header-link:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.header-link[hidden] { display: none; }
+/* The screen you are already on. Still there, so the row does not reflow and a
+   control never moves out from under a finger reaching for it, but visibly not
+   a destination. */
+.header-link[aria-current="page"] {
+    border-color: var(--primary);
+    color: var(--brand-1);
+    cursor: default;
+}
+#header-username { color: var(--brand-1); }
+:root[data-theme="dark"] .auth-error { color: #fca5a5; }
+:root[data-theme="dark"] #header-username { color: #7dc4f0; }
+
+/* --- geometry diagrams -------------------------------------------- */
+.question-diagram {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 19px;
+}
+.question-diagram[hidden] { display: none; }
+.dgm { width: 100%; max-width: 280px; height: auto; }
+.dgm-shape { fill: rgba(13, 148, 136, 0.10); stroke: var(--brand-1); stroke-width: 2.5; stroke-linejoin: round; }
+.dgm-edge  { fill: none; stroke: var(--brand-1); stroke-width: 2; opacity: 0.5; }
+.dgm-dash  { fill: none; stroke: var(--danger); stroke-width: 2; stroke-dasharray: 5 4; }
+.dgm-right { fill: none; stroke: var(--danger); stroke-width: 2; }
+.dgm-label { fill: var(--text-color); font-family: inherit; font-size: 13px; font-weight: bold; }
+:root[data-theme="dark"] .dgm-shape { fill: rgba(45, 212, 191, 0.12); }
+
+/* --- device-responsive layer ------------------------------------- */
+/* Desktop: roomier canvas. */
+@media (min-width: 1024px) {
+    .container { max-width: 1040px; padding: 31px 34px; }
+    .setup-grid { grid-template-columns: 1.7fr 1fr; }
+}
+/* Tablet: comfortable single-panel width. */
+@media (min-width: 601px) and (max-width: 1023px) {
+    .container { max-width: 760px; }
+}
+/* Touch devices (phone/tablet): larger tap targets regardless of width. */
+@media (pointer: coarse) {
+    .lv-pill, .subject-tile, .auth-tab, .tab, .expand-btn { min-height: 48px; }
+    .btn { padding: 13px 20px; }
+    .form-control { min-height: 48px; }
+}
+/* Phones/small: the theme + logout pills sit at the top corners, so reserve a
+   row for them and drop the brand below — otherwise the pills overlap the
+   centered wordmark. The username truncates instead of pushing the pill wide. */
+@media (max-width: 640px) {
+    /* The toolbar is a flow row now, so the header needs no reserved band. */
+    .header-bar { top: 8px; }
+    /* Tighter cluster: three controls plus the logout pill on a 375px row. */
+    .header-tools { gap: 5px; }
+    .header-logout { max-width: 46vw; }
+    #header-username {
+        display: inline-block;
+        max-width: 30vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: bottom;
+    }
+    .brand-name { font-size: 1.45rem; }
+}
+/* Narrow phones: stack subjects and let pills fill the row. */
+@media (max-width: 400px) {
+    .subject-tiles { grid-template-columns: 1fr; }
+    .level-pills { display: grid; grid-template-columns: 1fr 1fr; }
+    .lv-pill { text-align: center; }
+}
+
+/* --- study mode on phones ---------------------------------------- */
+/* Phone screens have no room for the desk-sized version of any of this, so the
+   layout genuinely changes rather than just narrowing. */
+@media (max-width: 640px) {
+    /* Cards get their padding back from the edges. */
+    .mode-head { padding: 14px 12px; gap: 8px; }
+    .mode-body { padding: 0 12px 14px; gap: 12px; }
+    .mode-ico { font-size: 1.4rem; }
+    .mode-heads b { font-size: 1.02rem; }
+    .mode-heads small { font-size: 0.85rem; }
+    /* Full-width primary actions: a thumb should not have to aim. */
+    .mode-body .btn { justify-self: stretch; width: 100%; text-align: center; }
+
+    /* The drawer's phone layout lives at the END of the drawer section below,
+       NOT here. It used to sit in this block and every rule was dead: the base
+       .drawer rules appear later in this file at equal specificity, so they won
+       the cascade and the drawer stayed 330px wide with a useless sliver of page
+       behind it. A media query does not add specificity — only source order
+       decides, so an override must come after what it overrides. */
+
+    /* One topic per row, and the lesson card loses its desk-sized padding. */
+    .learn-grid { grid-template-columns: 1fr; gap: 10px; }
+    .learn-card { padding: 12px; }
+    .learn-actions .btn { flex: 1; text-align: center; }
+    .lesson-page { padding: 15px 14px 19px; }
+    .lesson-heads h2 { font-size: 1.15rem; }
+    .lesson-visual { margin: 12px 0; }
+    /* Prev/next side by side, the readiness CTA on its own full-width row. */
+    .lesson-footer { gap: 7px; }
+    .lesson-footer .btn { flex: 1; text-align: center; padding: 11px 8px; }
+    .lesson-footer .cta-btn { flex-basis: 100%; margin-inline-start: 0; }
+    .step-list, .recap-list { padding-inline-start: 15px; }
+    .sec-problem-body, .step-expr { font-size: 0.98rem; }
+    .sec-lead { font-size: 1.06rem; }
+    .sec-title { font-size: 1.2rem; }
+
+    /* The scope picker stacks: a select and three chips do not share a row at
+       this width without one of them becoming unreadable. */
+    .scope-row { width: 100%; }
+    .scope-grade { flex: 1; min-width: 0; }
+    .scope-chip { flex: 1; padding: 8px 7px; font-size: 0.9rem; }
+}
+.side-empty { color: var(--muted); font-size: 0.9rem; margin: 7px 0 0; line-height: 1.5; }
+/* Names what the ring measures. Without it the panel read as overall progress
+   and a student who had only studied saw 0% and assumed nothing registered. */
+.side-ring-label { text-align: center; color: var(--muted); font-size: 0.82rem; margin: 4px 0 10px; }
+
+/* =================================================================
+   Mode band: the study-or-quiz choice, above the settings form.
+   ================================================================= */
+.mode-stack { display: grid; gap: 14px; align-content: start; }
+
+/* Splits the personal board into its two halves — quizzes and study. */
+.dash-heading {
+    margin: 22px 2px 10px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    color: var(--brand-1);
+}
+.dash-heading:first-child { margin-top: 0; }
+:root[data-theme="dark"] .dash-heading { color: #2dd4bf; }
+
+.mode-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: var(--transition);
+}
+.mode-card.open { border-color: var(--brand-1); box-shadow: 0 6px 24px rgba(8, 20, 32, 0.10); }
+/* The study path is the one the feature exists to add, so it carries the
+   accent edge; the quiz card is the calmer sibling. */
+.mode-card.mode-study { border-inline-start: 4px solid var(--brand-1); }
+/* The gradeless subjects read as a third path, not a variant of either — a
+   distinct edge is what stops it being mistaken for a section of the quiz card. */
+.mode-card.mode-extra { border-inline-start: 4px solid var(--accent, #7c3aed); }
+
+.mode-head {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 17px;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    text-align: start;
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.mode-head:hover { background: var(--surface-alt); }
+.mode-head:focus-visible { outline: 3px solid var(--primary); outline-offset: -3px; }
+.mode-ico { flex: none; font-size: 1.7rem; line-height: 1; }
+.mode-heads { flex: 1; min-width: 0; }
+.mode-heads b { display: block; font-size: 1.12rem; color: var(--primary-dark); }
+.mode-heads small { display: block; margin-top: 3px; color: var(--muted); line-height: 1.5; }
+.mode-caret { flex: none; color: var(--brand-1); font-size: 1.1rem; transition: var(--transition); }
+.mode-card.open .mode-caret { transform: rotate(180deg); }
+
+.mode-body { padding: 4px 17px 17px; display: grid; gap: 14px; }
+.mode-body[hidden] { display: none; }
+.mode-when { margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.6; }
+.mode-body .form-group { margin-bottom: 0; }
+.mode-body .btn { justify-self: start; }
+
+/* =================================================================
+   Scope picker: grade, then the subjects that grade offers.
+   Shared by the drawer and the catalogue.
+   ================================================================= */
+.scope-picker { display: grid; gap: 8px; }
+.scope-row { display: flex; align-items: center; gap: 8px; }
+.scope-label { font-weight: bold; color: var(--primary-dark); font-size: 0.92rem; }
+/* Sized to its content, not stretched: the grade is one short word, and a
+   full-width select implied a longer choice than "כיתה ז'". Overrides
+   .form-control's width:100%. */
+.scope-grade { flex: 0 0 auto; width: auto; min-width: 116px; padding: 7px 10px; }
+.scope-subjects { display: flex; gap: 7px; flex-wrap: wrap; }
+.scope-chip {
+    min-height: var(--touch-target);
+    padding: 7px 15px;
+    background: var(--surface-alt);
+    color: var(--text-color);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.scope-chip:hover { border-color: var(--brand-1); }
+.scope-chip:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+/* aria-pressed is the source of truth for which subject is chosen, so the
+   selected look is driven off it rather than a parallel class that could
+   disagree with what a screen reader announces. */
+.scope-chip[aria-pressed="true"] {
+    background: var(--btn-grad);
+    background-color: var(--brand-1);
+    border-color: transparent;
+    color: #fff;
+}
+/* A gradeless subject's scope is stated, not chosen — see renderScopePicker. */
+.scope-chip.on { background: var(--btn-grad); background-color: var(--brand-1); border-color: transparent; color: #fff; cursor: default; }
+.scope-note { margin: 7px 0 0; color: var(--muted); font-size: 0.9rem; }
+
+/* The unfinished-quiz offer. Sits above both path cards and carries the accent
+   edge, because it is the one thing on this screen that is time-sensitive. */
+/* One card holding a heading and a row per unfinished quiz. A student can park
+   several — a maths quiz left to sit an English one — so this is a list, not a
+   single offer. */
+.resume-card {
+    margin-bottom: 15px; padding: 14px 17px;
+    background: var(--card-bg);
+    border: 1px solid var(--brand-1);
+    border-inline-start: 4px solid var(--brand-1);
+    border-radius: var(--border-radius);
+}
+.resume-card[hidden] { display: none; }
+
+.resume-title { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
+.resume-title b { color: var(--primary-dark); font-size: 1.05rem; }
+.resume-ico { flex: none; font-size: 1.35rem; line-height: 1; }
+
+.resume-item {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+    padding: 8px 0;
+}
+.resume-item + .resume-item { border-top: 1px solid var(--border); }
+.resume-text { min-width: 0; }
+.resume-text b { display: block; color: var(--text-color); font-size: 1rem; }
+.resume-text small { display: block; margin-top: 3px; color: var(--muted); line-height: 1.5; }
+.resume-actions { display: flex; gap: 7px; flex-wrap: nowrap; }
+.resume-actions .btn { margin: 0; white-space: nowrap; }
+
+@media (max-width: 640px) {
+    .resume-card { padding: 12px; }
+    /* Each row becomes label-over-buttons rather than squeezing both onto one
+       line, and the two buttons share the row. The phone rule
+       .btn { width: 100% } would otherwise stack them and make every entry
+       three rows tall, which with several parked quizzes fills the screen. */
+    .resume-item { align-items: stretch; }
+    .resume-actions { width: 100%; }
+    .resume-actions .btn { flex: 1; width: auto; text-align: center; }
+}
+:root[data-theme="dark"] .resume-card { background: #12263c; }
+:root[data-theme="dark"] .resume-title b { color: #7dc4f0; }
+
+.extra-blurb { margin: 0 0 12px; color: var(--muted); line-height: 1.6; }
+.extra-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.extra-actions .btn { flex: 1; min-width: 160px; margin: 0; }
+
+.learn-scope { margin-bottom: 17px; }
+.drawer-scope { padding: 12px 15px; border-bottom: 1px solid var(--border); }
+:root[data-theme="dark"] .scope-label,
+:root[data-theme="dark"] .setup-heading { color: #7dc4f0; }
+:root[data-theme="dark"] .scope-chip { background: #14273d; }
+:root[data-theme="dark"] .scope-chip[aria-pressed="true"] { background-color: #0f766e; }
+
+/* =================================================================
+   Topic drawer.
+   ================================================================= */
+.drawer-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 20, 32, 0.5);
+    opacity: 0;
+    transition: opacity 0.22s ease;
+    z-index: 40;
+    border: none;
+    cursor: pointer;
+}
+.drawer-scrim.open { opacity: 1; }
+.drawer-scrim[hidden] { display: none; }
+
+.drawer {
+    position: fixed;
+    /* inset-inline-start, not left: on this RTL page it resolves to the right
+       edge, and it stays correct if the app is ever rendered LTR. */
+    inset-inline-start: 0;
+    top: 0;
+    bottom: 0;
+    width: min(360px, 88vw);
+    background: var(--card-bg);
+    border-inline-end: 1px solid var(--border);
+    box-shadow: 0 0 40px rgba(8, 20, 32, 0.25);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    /* Off-screen toward its own edge. -100% in the inline axis is start-ward in
+       both directions, which is why this needs no RTL special case. */
+    transform: translateX(100%);
+    transition: transform 0.22s ease;
+}
+[dir="ltr"] .drawer { transform: translateX(-100%); }
+.drawer.open { transform: none; }
+.drawer[hidden] { display: none; }
+
+/* The page must not scroll behind an open drawer. */
+body.drawer-locked { overflow: hidden; }
+
+.drawer-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 15px 15px 12px;
+    border-bottom: 1px solid var(--border);
+}
+.drawer-top > div { flex: 1; min-width: 0; }
+.drawer-title { display: block; font-size: 1.05rem; }
+.drawer-context { display: block; color: var(--brand-1); font-weight: 700; margin-top: 2px; }
+
+.drawer-close {
+    flex: none;
+    min-width: var(--touch-target);
+    min-height: var(--touch-target);
+    background: var(--surface-alt);
+    color: var(--text-color);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.drawer-close:hover { border-color: var(--danger); color: var(--danger); }
+.drawer-close:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+/* min-height:0 is load-bearing. A flex item defaults to min-height:auto, which
+   refuses to shrink below its content — so a long topic list grew the body past
+   the drawer instead of scrolling inside it, pushing the version footer out of
+   view below the bottom edge. */
+.drawer-body { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 0 20px; }
+
+.drawer-group + .drawer-group { border-top: 1px solid var(--border); }
+.drawer-group-head {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: var(--touch-target);
+    padding: 12px 15px;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    text-align: start;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.drawer-group-head:hover { background: var(--surface-alt); }
+.drawer-group-head:focus-visible { outline: 3px solid var(--primary); outline-offset: -3px; }
+.drawer-group-titles { flex: 1; min-width: 0; }
+.drawer-group-titles b { display: block; font-size: 1rem; }
+.drawer-group-titles small { display: block; color: var(--muted); margin-top: 2px; }
+.drawer-caret { color: var(--brand-1); transition: var(--transition); }
+.drawer-group.open .drawer-caret { transform: rotate(180deg); }
+
+/* Sits below the scrolling list, as the last row of the flex column. The list
+   above it takes the slack, so no auto margin is needed to push it down — and
+   on a phone the whole drawer is one scroll container, where it simply follows
+   the topics. */
+/* The haptics switch, sitting just above the version line. Full width and a
+   real tap target, because it lives on the surface it controls: a phone. */
+.drawer-pref {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    width: 100%; margin: 0; padding: 10px 15px;
+    min-height: var(--touch-target);
+    background: none; border: 0; border-top: 1px solid var(--border);
+    color: var(--text-color); font-family: inherit; font-size: 0.86rem;
+    text-align: start; cursor: pointer;
+}
+.drawer-pref:hover { background: var(--surface-alt); }
+.drawer-pref:focus-visible { outline: 3px solid var(--primary); outline-offset: -3px; }
+.drawer-pref-state { color: var(--muted); font-weight: bold; }
+.drawer-pref[aria-pressed="true"] .drawer-pref-state { color: var(--secondary); }
+
+.drawer-foot {
+    flex: none;
+    margin: 0;
+    padding: 10px 15px calc(10px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.78rem;
+    letter-spacing: 0.3px;
+    text-align: center;
+}
+.drawer-foot:empty { display: none; }
+@media (max-width: 640px) { .drawer-foot { margin-top: 14px; } }
+
+.drawer-list { list-style: none; margin: 0; padding: 0 0 8px; }
+.drawer-empty { padding: 7px 15px 12px; color: var(--muted); font-size: 0.9rem; }
+
+.drawer-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: var(--touch-target);
+    padding: 8px 22px 8px 15px;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    text-align: start;
+    font-size: 0.96rem;
+}
+.drawer-item-btn { cursor: pointer; transition: var(--transition); }
+.drawer-item-btn:hover { background: var(--surface-alt); }
+.drawer-item-btn:focus-visible { outline: 3px solid var(--primary); outline-offset: -3px; }
+.drawer-item-label { flex: 1; min-width: 0; }
+.drawer-item.soon { color: var(--muted); }
+.drawer-tag {
+    flex: none;
+    background: var(--surface-alt);
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+.drawer-tick { flex: none; color: var(--success); font-weight: 800; }
+.drawer-time { flex: none; color: var(--muted); font-size: 0.82rem; }
+
+/* The pull-tab that opens it. Anchored to the edge the drawer comes from, and
+   vertically centred so it is reachable on every screen without scrolling. */
+.drawer-handle {
+    position: fixed;
+    inset-inline-start: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 46px;
+    padding: 12px 4px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border);
+    /* Square against the edge it is attached to, rounded on the inner side. */
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+    border-start-end-radius: 14px;
+    border-end-end-radius: 14px;
+    border-inline-start: none;
+    box-shadow: 0 4px 18px rgba(8, 20, 32, 0.14);
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.drawer-handle:hover { border-color: var(--primary); padding-inline-end: 8px; }
+.drawer-handle:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.drawer-handle[hidden] { display: none; }
+.drawer-handle-ico { font-size: 1.15rem; line-height: 1; color: var(--brand-1); }
+.drawer-handle-text {
+    font-size: 0.72rem;
+    font-weight: 700;
+    /* Rotated to read bottom-to-top so the tab stays narrow. */
+    writing-mode: vertical-rl;
+    letter-spacing: 1px;
+}
+
+/* The handle sits at the same edge the drawer slides out of, so an open drawer
+   covers it — on a phone it is buried under the panel entirely. Retract it
+   while the drawer is open: it duplicates the close button, and leaving it
+   there kept a dead tab stop underneath the panel. Fades rather than popping,
+   so the slide reads as one movement.
+
+   Slides out toward its own edge, matching the .drawer convention above:
+   +100% is edge-ward on this RTL page, -100% when rendered LTR. */
+body.drawer-locked .drawer-handle {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) translateX(100%);
+}
+[dir="ltr"] body.drawer-locked .drawer-handle { transform: translateY(-50%) translateX(-100%); }
+
+/* --- the drawer on phones ----------------------------------------- */
+/* Placed AFTER the base rules on purpose. A media query carries no extra
+   specificity, so these have to come later in the file to win — the previous
+   version lived 250 lines above and did nothing at all. */
+@media (max-width: 640px) {
+    /* Full bleed. The old 88vw left a 45px strip of blurred page that showed no
+       usable context and cost the topic labels their width. */
+    .drawer {
+        width: 100%;
+        border-inline-end: none;
+        /* Notch and home-indicator clearance: without this the close button can
+           sit under a rounded corner on a modern phone. */
+        padding-top: env(safe-area-inset-top, 0);
+        padding-bottom: env(safe-area-inset-bottom, 0);
+        /* One scroll container instead of two. The scope picker scrolls away
+           with the list rather than being pinned — pinned, it ate 234px of an
+           812px screen before a single topic was visible. */
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    /* Only the title bar stays put, so closing is always one tap away. */
+    .drawer-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: var(--card-bg);
+        padding: 12px 12px 10px;
+    }
+    .drawer-title { font-size: 0.98rem; }
+
+    .drawer-scope { padding: 10px 12px; }
+    /* flex:1 would make the body absorb the free space and keep its own
+       scrollbar, which is the two-scroll-container layout this replaces. */
+    .drawer-body { flex: 0 0 auto; overflow: visible; padding-top: 4px; }
+
+    /* Full-width rows with a comfortable target; the labels are Hebrew topic
+       names and need every pixel of the line. */
+    .drawer-group-head { padding: 12px 12px; }
+    .drawer-item { padding: 10px 17px 10px 12px; }
+    .drawer-empty { padding: 7px 12px 12px; }
+
+    /* The edge tab is retired here. It is position:fixed and vertically centred,
+       so on a phone it floats ON TOP of whichever card happens to be at mid
+       screen — and a 375px viewport has no width to give up as a gutter beside
+       it. The header button takes over, in the document flow where it cannot
+       cover anything. [hidden] still wins on both while signed out. */
+    .drawer-handle { display: none; }
+    .header-menu { display: inline-flex; }
+}
+
+/* =================================================================
+   Study mode: the topic catalogue and the lesson screen.
+   ================================================================= */
+
+/* --- shared bits -------------------------------------------------- */
+.btn-small { padding: 8px 14px; font-size: 0.92rem; }
+.btn-learn { background: var(--btn-grad); background-color: var(--brand-1); }
+
+/* --- topic catalogue ---------------------------------------------- */
+.learn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+.learn-empty { color: var(--muted); }
+
+.learn-card {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    transition: var(--transition);
+}
+.learn-card:hover { border-color: var(--brand-1); transform: translateY(-2px); }
+/* A topic with no lesson yet is dimmed but never hidden: hiding it would imply
+   the subject has five topics when it has forty. */
+.learn-card.soon { opacity: 0.72; }
+.learn-card.soon:hover { transform: none; }
+.learn-card.done { border-inline-start: 4px solid var(--brand-1); }
+/* Part-way is its own state, not a dimmer version of done — the student needs
+   to see at a glance which lesson they can pick back up. */
+.learn-card.partial { border-inline-start: 4px dashed var(--brand-2); }
+.learn-partial { color: var(--brand-2); font-weight: 700; }
+.drawer-partial { flex: none; color: var(--brand-2); font-size: 0.8rem; font-weight: 700; }
+
+.learn-topic { margin: 0; font-size: 1.08rem; color: var(--primary-dark); }
+.learn-intro { margin: 0; color: var(--muted); font-size: 0.94rem; line-height: 1.55; }
+.learn-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 0.85rem; }
+.learn-time { color: var(--muted); }
+.learn-done { color: var(--success); font-weight: 800; }
+.learn-soon {
+    background: var(--surface-alt);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-weight: 700;
+}
+.learn-actions { display: flex; gap: 7px; margin-top: auto; padding-top: 5px; flex-wrap: wrap; }
+
+/* --- lesson shell -------------------------------------------------- */
+.lesson-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.lesson-heads { flex: 1; min-width: 0; }
+.lesson-heads h2 { margin: 4px 0 0; font-size: clamp(1.3rem, 3vw, 1.75rem); line-height: 1.25; }
+.lesson-badge { color: var(--brand-1); font-weight: 800; font-size: 0.88rem; }
+
+.lesson-close {
+    flex: none;
+    min-width: var(--touch-target);
+    min-height: var(--touch-target);
+    background: var(--surface-alt);
+    color: var(--text-color);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.lesson-close:hover { border-color: var(--danger); color: var(--danger); }
+.lesson-close:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+.lesson-dots { display: flex; gap: 5px; margin-bottom: 14px; }
+.lesson-dot {
+    height: 6px;
+    flex: 1;
+    border-radius: 999px;
+    background: var(--ring-track);
+    transition: var(--transition);
+}
+.lesson-dot.past { background: var(--brand-1); opacity: 0.45; }
+.lesson-dot.on { background: var(--brand-1); }
+
+.lesson-footer { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.lesson-footer .cta-btn { margin-inline-start: auto; }
+#lesson-next[hidden], #lesson-quiz-btn[hidden] { display: none; }
+
+/* --- the lesson page ------------------------------------------------
+   Styled as a page of a textbook, not a step in a wizard: a wide, quiet
+   reading column with generous line-height, section kickers instead of
+   progress chrome, and boxed asides where a book would use the margin. */
+
+.lesson-counter {
+    margin: 0 0 15px;
+    color: var(--muted);
+    font-size: 0.86rem;
+    letter-spacing: 0.4px;
+}
+
+.lesson-page {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    /* Roomier than a card: this is meant to be read, not scanned. */
+    padding: 29px 32px 32px;
+    margin-bottom: 17px;
+}
+/* Restarted from JS on every section change. The global prefers-reduced-motion
+   rule disables it. */
+.card-enter { animation: card-in 0.28s ease both; }
+@keyframes card-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* A comfortable measure. Long lines are the single biggest thing that makes a
+   screen of prose feel like a form rather than a page. */
+.sec { max-width: 62ch; }
+.sec-head { margin-bottom: 15px; }
+.sec-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--brand-1);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+.sec-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--brand-1);
+    color: #fff;
+    font-size: 0.75rem;
+    letter-spacing: 0;
+}
+.sec-title {
+    margin: 7px 0 0;
+    font-size: clamp(1.3rem, 2.6vw, 1.6rem);
+    line-height: 1.3;
+    color: var(--text-color);
+    font-weight: 800;
+}
+
+.sec-lead {
+    margin: 0 0 17px;
+    font-size: 1.14rem;
+    line-height: 1.75;
+    color: var(--text-color);
+}
+.sec-body { margin: 0 0 14px; font-size: 1.03rem; line-height: 1.9; }
+.sec-body:last-child { margin-bottom: 0; }
+
+/* The margin note of a textbook: true and useful, but off the main argument. */
+.sec-aside {
+    margin: 19px 0 0;
+    padding: 12px 14px;
+    background: var(--surface);
+    border-inline-start: 3px solid var(--brand-2);
+    border-radius: 0 10px 10px 0;
+}
+.sec-aside-tag {
+    display: block;
+    color: var(--brand-2);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+.sec-aside-body { line-height: 1.8; }
+
+/* The boxed rule a textbook prints at the end of a section. */
+.sec-rule {
+    margin-top: 20px;
+    padding: 14px 15px;
+    background: var(--surface);
+    border: 2px solid var(--brand-1);
+    border-radius: 12px;
+}
+.sec-rule-tag {
+    display: block;
+    color: var(--brand-1);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    margin-bottom: 5px;
+}
+.sec-rule-body { font-size: 1.06rem; font-weight: 700; line-height: 1.7; }
+
+.sec-problem {
+    margin: 0 0 17px;
+    padding: 14px 15px;
+    background: var(--surface-alt);
+    border-radius: 12px;
+}
+.sec-problem-tag {
+    display: block;
+    color: var(--muted);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+.sec-problem-body { font-size: 1.08rem; line-height: 1.7; }
+
+.sec-answer {
+    margin-top: 17px;
+    padding: 12px 15px;
+    background: rgba(13, 148, 136, 0.10);
+    border-radius: 12px;
+}
+.sec-answer-tag {
+    display: block;
+    color: var(--brand-1);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+.sec-answer-body { font-size: 1.08rem; font-weight: 700; line-height: 1.7; }
+.sec-note { margin: 14px 0 0; color: var(--muted); line-height: 1.8; }
+
+.lesson-visual { display: flex; justify-content: center; margin: 20px 0; }
+.vz { width: 100%; max-width: 340px; height: auto; }
+
+/* --- worked steps --------------------------------------------------- */
+.step-list { margin: 0; padding-inline-start: 20px; display: grid; gap: 15px; }
+.step { animation: card-in 0.24s ease both; line-height: 1.85; }
+/* A step revealed into a card that is already on screen is animated from JS,
+   which measures its real height. The CSS keyframe above is suppressed for it —
+   two animations on one element fight, and the fade would finish while the box
+   was still growing. overflow is clipped only while it is shorter than its
+   text; ui-lesson.js drops the class the moment the animation ends. */
+.step-opening { animation: none; overflow: hidden; }
+.step::marker { color: var(--brand-1); font-weight: 800; }
+.step-expr {
+    margin-top: 7px;
+    background: var(--surface-alt);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: inline-block;
+    font-size: 1.02rem;
+}
+.step-current .step-expr { background: rgba(13, 148, 136, 0.12); }
+.step-btn { margin-top: 20px; }
+
+/* --- worked example (shown whole) ----------------------------------- */
+.solution-list { margin: 0; padding-inline-start: 20px; display: grid; gap: 12px; }
+.solution-line { line-height: 1.85; }
+.solution-line::marker { color: var(--brand-1); font-weight: 800; }
+
+/* --- pitfall -------------------------------------------------------- */
+.pitfall-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 560px) { .pitfall-pair { grid-template-columns: 1fr; } }
+.pitfall-side { border-radius: 12px; padding: 14px; border: 1px solid var(--border); }
+.pitfall-side.wrong { background: #fff5f5; border-color: var(--danger); }
+.pitfall-side.right { background: #f0fff4; border-color: var(--success); }
+.pitfall-tag { display: block; font-weight: 800; margin-bottom: 7px; font-size: 0.86rem; }
+.pitfall-side.wrong .pitfall-tag { color: var(--danger-dark); }
+.pitfall-side.right .pitfall-tag { color: var(--success); }
+.pitfall-body { line-height: 1.8; }
+.pitfall-why { margin: 17px 0 0; line-height: 1.9; }
+
+/* --- recap ---------------------------------------------------------- */
+.recap-list { margin: 0; padding-inline-start: 20px; display: grid; gap: 12px; }
+.recap-item { line-height: 1.8; font-size: 1.03rem; }
+.recap-item::marker { color: var(--brand-1); }
+
+/* --- page navigation ------------------------------------------------ */
+/* Quiet text-style controls: page turns, not calls to action. The only filled
+   button on the page is the one that leaves the lesson for the quiz. */
+.btn-quiet {
+    background: none;
+    background-color: transparent;
+    color: var(--brand-1);
+    border: 1px solid var(--border);
+    font-weight: 700;
+}
+.btn-quiet:hover { background: var(--surface-alt); border-color: var(--brand-1); }
+.btn-quiet:disabled { color: var(--muted); opacity: 0.5; cursor: default; }
+.btn-quiet:disabled:hover { background: none; border-color: var(--border); }
+
+
+
+/* --- the three entry points outside the catalogue -------------------- */
+#feedback-learn { margin-top: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+#feedback-learn:empty { display: none; }
+.feedback-learn-lead { font-weight: 700; }
+.error-item .btn-learn { margin-top: 8px; }
+/* Topic + lesson as ONE segmented control.
+   They used to be two free-standing shapes with a gap between them: a 999px
+   pale pill next to a solid teal slab with its own radius, its own weight and
+   its own shadow. The slab shouted louder than the topic it belonged to, and
+   six rows of them read as a stack of unrelated widgets rather than a list.
+   Now a single bordered container holds both, the parts have no border or
+   radius of their own, and a hairline divides them — so the eye sees one row
+   per topic while the DOM keeps two real buttons, which it must, because a
+   button cannot nest inside a button. */
+.chip-pair {
+    display: inline-flex;
+    align-items: stretch;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: var(--surface);
+}
+.chip-pair:hover { border-color: var(--primary); }
+.chip-pair > .chip {
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    flex: 1;
+    min-width: 0;
+}
+.chip-pair > .chip:hover { background-color: var(--surface-alt); }
+/* Quiet, and divided from the topic by a hairline rather than by a gap. The
+   lesson is the secondary offer here; the topic itself is the subject. */
+.chip-pair .chip-learn {
+    margin: 0;
+    border: 0;
+    border-inline-start: 1px solid var(--border);
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    color: var(--brand-1);
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    flex: 0 0 auto;
+}
+.chip-pair .chip-learn:hover { background: var(--surface-alt); color: var(--primary); }
+.chip-pair .chip-learn:focus-visible { outline: 3px solid var(--primary); outline-offset: -3px; }
+
+/* The weak-topic list is a LIST: one row per topic, every row the full width.
+   Wrapping them as free-width pills left a ragged edge — 206px, 189px, 155px in
+   a 265px panel — so the lesson buttons landed in three different places and
+   the eye had to hunt for each one. Stacked, the counts line up down one edge
+   and the lesson buttons down the other, and the rows can be compared at a
+   glance, which is the entire job of a ranked list.
+   Not in a media query: this is a narrow column at every width. */
+.side-weak-chips {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+}
+.side-weak-chips > .chip-pair { display: flex; width: 100%; }
+.side-weak-chips > .chip { border-radius: 10px; }
+/* .chip-learn is a .btn, and the phone rule up the file sets .btn { width:100% }
+   for thumb-sized primary actions. Inside the segment it must stay its own
+   size, or it swallows the row and crushes the topic name. */
+.side-weak-chips .chip-pair .btn { width: auto; flex: 0 0 auto; }
+
+/* --- lesson visuals -------------------------------------------------- */
+.vz-cell { fill: var(--surface-alt); stroke: var(--border); stroke-width: 1; }
+.vz-cell.on { fill: rgba(13, 148, 136, 0.45); stroke: var(--brand-1); }
+.vz-ring { fill: none; stroke: var(--brand-1); stroke-width: 2.5; }
+.vz-label { fill: var(--text-color); font-family: inherit; font-size: 13px; font-weight: bold; }
+.vz-line { stroke: var(--border); stroke-width: 2; fill: none; }
+.vz-arrow { fill: var(--border); }
+.vz-beam { stroke: var(--brand-1); stroke-width: 4; stroke-linecap: round; }
+.vz-pivot { fill: var(--brand-1); }
+.vz-stand { fill: rgba(13, 148, 136, 0.18); stroke: var(--brand-1); stroke-width: 2; }
+.vz-ground { stroke: var(--brand-1); stroke-width: 3; stroke-linecap: round; }
+.vz-pan { fill: rgba(13, 148, 136, 0.14); stroke: var(--brand-1); stroke-width: 2; }
+.vz-pan-text { fill: var(--text-color); font-family: inherit; font-size: 15px; font-weight: bold; }
+.vz-node { fill: var(--surface-alt); stroke: var(--border); stroke-width: 2; }
+.vz-node.on { fill: rgba(13, 148, 136, 0.45); stroke: var(--brand-1); }
+.vz-node-box { fill: var(--surface-alt); stroke: var(--border); stroke-width: 1.5; }
+.vz-node-box.on { fill: rgba(13, 148, 136, 0.28); stroke: var(--brand-1); stroke-width: 2.5; }
+.vz-root { fill: rgba(13, 148, 136, 0.18); stroke: var(--brand-1); stroke-width: 2.5; }
+.vz-root-text { fill: var(--text-color); font-family: inherit; font-size: 18px; font-weight: 800; }
+.vz-word { fill: var(--text-color); font-family: inherit; font-size: 14px; font-weight: bold; }
+.vz-tag { fill: var(--muted); font-family: inherit; font-size: 11px; font-weight: bold; letter-spacing: 1px; }
+/* Statistics and measurement. The slice ramp runs teal→cyan→blue so the
+   categories stay distinguishable in both themes and in greyscale print. */
+.vz-slice { stroke: var(--card-bg); stroke-width: 2; }
+.vz-slice-0 { fill: #0f766e; }
+.vz-slice-1 { fill: #0891b2; }
+.vz-slice-2 { fill: #38bdf8; }
+.vz-slice-3 { fill: #7dd3fc; }
+.vz-slice-4 { fill: #a5b4fc; }
+.vz-dial { fill: var(--surface-alt); stroke: var(--brand-1); stroke-width: 2.5; }
+.vz-hand-hour { stroke: var(--text-color); stroke-width: 5; stroke-linecap: round; }
+.vz-hand-min { stroke: var(--brand-1); stroke-width: 3; stroke-linecap: round; }
+.vz-measure { stroke: var(--danger); stroke-width: 2.5; stroke-linecap: round; }
+.vz-tick { fill: var(--muted); font-family: inherit; font-size: 11px; font-weight: bold; }
+.vz-axis { stroke: var(--text-color); stroke-width: 2; fill: none; }
+.vz-grid { stroke: var(--border); stroke-width: 1; opacity: 0.55; }
+.vz-curve { fill: none; stroke: var(--brand-1); stroke-width: 2.5; stroke-linejoin: round; }
+.vz-nofill { fill: none; }
+.vz-shape { fill: rgba(13, 148, 136, 0.12); stroke: var(--brand-1); stroke-width: 2.5; stroke-linejoin: round; }
+.vz-shape-alt { fill: rgba(8, 145, 178, 0.20); }
+.vz-dash { fill: none; stroke: var(--danger); stroke-width: 2; stroke-dasharray: 5 4; }
+.vz-right { fill: none; stroke: var(--danger); stroke-width: 2; }
+
+/* Abstract figures — psychotechnical series, matrices and nets. */
+/* Named apart from .vz-cell above, which percentGrid and arrayGrid already own.
+   Reusing that name here silently stripped their fill — a later rule with the
+   same selector wins, so both sets of visuals cannot share it. */
+.vz-fcell { fill: none; stroke: var(--border); stroke-width: 1.5; rx: 6; }
+.vz-fcell-missing { stroke: var(--brand-1); stroke-width: 2.5; stroke-dasharray: 6 4; }
+.vz-fig { fill: none; stroke: var(--brand-1); stroke-width: 2.5; stroke-linejoin: round; }
+.vz-fig-on { fill: rgba(13, 148, 136, 0.28); }
+.vz-fig-dot { fill: var(--brand-1); }
+.vz-qmark { fill: var(--brand-1); font-family: inherit; font-size: 22px; font-weight: bold; }
+.vz-face { fill: var(--text-color); font-family: inherit; font-size: 18px; font-weight: bold; }
+
+/* An option whose content is a figure: the SVG is the answer, so it gets the
+   room a line of text would not need, and the list lays out as a grid.
+   Two across on a phone — four would leave ~70px each, smaller than the
+   difference between two of the figures. The narrow case is the default rather
+   than an override in the mobile block above, because that block appears EARLIER
+   in this file and would lose the cascade to these rules at equal specificity. */
+.options-list.options-visual { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (min-width: 601px) {
+    .options-list.options-visual { grid-template-columns: repeat(4, 1fr); }
+}
+.options-list.options-visual .option-item { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 5px; }
+.option-figure { width: 100%; max-width: 84px; }
+.option-figure .vz { max-width: 84px; }
+.option-tag { font-weight: bold; color: var(--muted); font-size: 0.95rem; }
+
+/* --- dark theme ------------------------------------------------------ */
+:root[data-theme="dark"] .mode-card { background: #12263c; }
+:root[data-theme="dark"] .mode-heads b { color: #7dc4f0; }
+:root[data-theme="dark"] .mode-head:hover { background: #14273d; }
+:root[data-theme="dark"] .drawer { background: #0f2033; }
+:root[data-theme="dark"] .drawer-close,
+:root[data-theme="dark"] .drawer-tag { background: #14273d; }
+:root[data-theme="dark"] .drawer-group-head:hover,
+:root[data-theme="dark"] .drawer-item-btn:hover { background: #14273d; }
+:root[data-theme="dark"] .drawer-tick { color: #9ae6b4; }
+:root[data-theme="dark"] .learn-partial,
+:root[data-theme="dark"] .drawer-partial { color: #7dd3fc; }
+:root[data-theme="dark"] .drawer-handle { background: #12263c; }
+:root[data-theme="dark"] .drawer-scrim { background: rgba(0, 0, 0, 0.62); }
+:root[data-theme="dark"] .learn-card { background: #12263c; }
+:root[data-theme="dark"] .learn-topic { color: #7dc4f0; }
+:root[data-theme="dark"] .learn-done { color: #9ae6b4; }
+:root[data-theme="dark"] .learn-soon { background: #14273d; }
+:root[data-theme="dark"] .lesson-page { background: #12263c; }
+:root[data-theme="dark"] .lesson-close { background: #14273d; }
+:root[data-theme="dark"] .sec-problem,
+:root[data-theme="dark"] .step-expr,
+:root[data-theme="dark"] .sec-rule,
+:root[data-theme="dark"] .sec-aside { background: #0c1c2e; }
+:root[data-theme="dark"] .sec-answer { background: rgba(45, 212, 191, 0.14); }
+:root[data-theme="dark"] .step-current .step-expr { background: rgba(45, 212, 191, 0.16); }
+:root[data-theme="dark"] .btn-quiet { color: #2dd4bf; background: none; }
+:root[data-theme="dark"] .btn-quiet:hover { background: #14273d; }
+:root[data-theme="dark"] .pitfall-side.wrong { background: #3a1a1a; border-color: #c53030; }
+:root[data-theme="dark"] .pitfall-side.right { background: #0f2e22; border-color: #2f855a; }
+:root[data-theme="dark"] .pitfall-side.wrong .pitfall-tag { color: #feb2b2; }
+:root[data-theme="dark"] .pitfall-side.right .pitfall-tag { color: #9ae6b4; }
+:root[data-theme="dark"] .btn-learn { background-color: #0f766e; }
+:root[data-theme="dark"] .vz-cell.on,
+:root[data-theme="dark"] .vz-node.on { fill: rgba(45, 212, 191, 0.42); }
+:root[data-theme="dark"] .vz-node-box.on { fill: rgba(45, 212, 191, 0.26); }
+:root[data-theme="dark"] .vz-stand,
+:root[data-theme="dark"] .vz-pan { fill: rgba(45, 212, 191, 0.16); }
+:root[data-theme="dark"] .vz-root { fill: rgba(45, 212, 191, 0.20); }
+:root[data-theme="dark"] .vz-shape { fill: rgba(45, 212, 191, 0.14); }
+:root[data-theme="dark"] .vz-shape-alt { fill: rgba(34, 211, 238, 0.22); }
+:root[data-theme="dark"] .vz-grid { opacity: 0.4; }
+
+/* =================================================================
+   משחקים — the timed sprint.
+   ================================================================= */
+.mode-card.mode-game { border-inline-start: 4px solid #f0b429; }
+.game-rules {
+    margin: 0 0 12px; padding: 8px 10px;
+    background: var(--surface-alt); border-radius: 10px;
+    color: var(--muted); font-size: 0.86rem; line-height: 1.6;
+}
+:root[data-theme="dark"] .game-rules { background: #0f2033; }
+
+.game-hud { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.game-stat { flex: 1; text-align: center; padding: 8px 5px; background: var(--surface-alt); border-radius: 12px; }
+.game-stat b { display: block; font-size: 1.6rem; line-height: 1.1; color: var(--brand-1); }
+.game-stat small { color: var(--muted); font-size: 0.78rem; }
+/* The clock recolours under ten seconds so a student reading the question
+   still registers it without watching the number. */
+.game-stat b.urgent { color: var(--danger); }
+.game-stat b.hot { color: #f0b429; }
+:root[data-theme="dark"] .game-stat { background: #0f2033; }
+
+.game-timebar { height: 10px; background: var(--surface-alt); border-radius: 999px; overflow: hidden; margin-bottom: 5px; }
+.game-timefill {
+    height: 100%; width: 100%;
+    background: linear-gradient(90deg, var(--brand-2), var(--brand-1));
+    /* Matches the 100ms tick, so the bar glides rather than stepping. */
+    transition: width 0.1s linear;
+}
+:root[data-theme="dark"] .game-timebar { background: #0f2033; }
+
+/* The only feedback a sprint gives: it must never take three seconds silently. */
+.game-flash { min-height: 1.4em; margin: 0 0 7px; text-align: center; font-weight: bold; color: var(--danger); opacity: 0; }
+.game-flash.show { animation: flash-out 0.9s ease both; }
+@keyframes flash-out {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(-8px); }
+}
+
+.board-empty { color: var(--muted); margin: 8px 0 0; }
+.history-table tr.me { background: rgba(13, 148, 136, 0.10); font-weight: bold; }
+:root[data-theme="dark"] .history-table tr.me { background: rgba(45, 212, 191, 0.14); }
+
+@media (max-width: 640px) {
+    .game-stat b { font-size: 1.3rem; }
+    .game-hud { gap: 5px; }
+}
+
+/* The mode picker. auto-fit so another game needs no CSS change. */
+.game-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.game-mode {
+    display: flex; flex-direction: column; gap: 3px;
+    padding: 10px; text-align: start;
+    background: var(--surface); border: 2px solid var(--border); border-radius: 12px;
+    color: var(--text-color); font-family: inherit; cursor: pointer;
+    transition: var(--transition); min-height: var(--touch-target);
+}
+.game-mode b { font-size: 1rem; }
+.game-mode small { color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
+.game-mode:hover { border-color: var(--primary); }
+.game-mode:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.game-mode[aria-pressed="true"] { border-color: #f0b429; background: rgba(240, 180, 41, 0.10); }
+.game-mode[aria-pressed="true"] b { color: #b45309; }
+:root[data-theme="dark"] .game-mode { background: #14273d; }
+:root[data-theme="dark"] .game-mode[aria-pressed="true"] { background: rgba(240, 180, 41, 0.14); }
+:root[data-theme="dark"] .game-mode[aria-pressed="true"] b { color: #fbbf24; }
+/* Four HUD slots on a phone need to stay legible. */
+@media (max-width: 640px) { .game-stat small { font-size: 0.68rem; } }
+
+/* --- lesson checkpoints ---------------------------------------------- */
+/* Styled as part of the lesson, not as a test. No score, no marking, and
+   deliberately no correct/incorrect states to style: answering moves the lesson
+   on or moves it back, and the student is never shown which. A red X here would
+   undo the entire reason the checkpoint is silent. */
+.sec-check { border-inline-start: 4px solid var(--brand-1); }
+.check-question { font-size: 1.08rem; font-weight: 600; margin: 0 0 14px; }
+.check-options { display: flex; flex-direction: column; gap: 9px; }
+.check-option {
+    text-align: start;
+    padding: 12px 14px;
+    min-height: var(--touch-target);
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.check-option:hover { border-color: var(--primary); background-color: var(--surface-alt); }
+.check-option:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+/* --- code blocks in questions ---------------------------------------- */
+/* A snippet is left-to-right and the question around it is right-to-left, so
+   the block pins its own direction and alignment. Without `text-align: left`
+   the lines would sit flush right inside an LTR box — technically isolated,
+   visually still wrong.
+   `display: block` with a margin lifts it out of the sentence: a three-line
+   program inline with Hebrew prose reads as neither. */
+.code-block {
+    display: block;
+    direction: ltr;
+    text-align: left;
+    unicode-bidi: isolate;
+    white-space: pre-wrap;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin: 12px 0 4px;
+    padding: 12px 14px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-inline-start: 3px solid var(--brand-1);
+    border-radius: 8px;
+    overflow-x: auto;
+}
+:root[data-theme="dark"] .code-block { background: #0f2033; border-color: #263a52; }
