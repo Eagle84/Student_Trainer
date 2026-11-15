@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" width="1200" height="340" role="img" aria-label="המתרגל שלי — Student Trainer">
+  <defs>
+    <linearGradient id="brand" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#2dd4bf"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1a2b"/>
+      <stop offset="1" stop-color="#12263c"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="340" rx="20" fill="url(#sky)"/>
+  <rect x="1" y="1" width="1198" height="338" rx="19" fill="none" stroke="#24425f" stroke-width="2"/>
+
+  <!-- brand mark: the same chart-arrow used in the app header -->
+  <g transform="translate(64 72)">
+    <rect x="0" y="0" width="112" height="112" rx="30" fill="#0f2033" stroke="#24425f" stroke-width="2"/>
+    <g transform="translate(12 12) scale(1.375)">
+      <path d="M14 42 L26 30 L34 37 L50 20" fill="none" stroke="url(#brand)"
+            stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M40 20 L50 20 L50 30" fill="none" stroke="url(#brand)"
+            stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <text x="212" y="118" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="54"
+        font-weight="700" fill="#e6eef8">המתרגל שלי</text>
+  <text x="212" y="158" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="25"
+        font-weight="600" fill="#2dd4bf">Student Trainer</text>
+  <text x="212" y="196" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="19"
+        fill="#8fa6c0">A Hebrew, right-to-left study-and-quiz app. No build step, no dependencies.</text>
+
+  <!-- stat chips -->
+  <g font-family="Segoe UI, Helvetica, Arial, sans-serif">
+    <g transform="translate(212 226)">
+      <rect width="176" height="72" rx="14" fill="#0f2033" stroke="#24425f" stroke-width="1.5"/>
+      <text x="88" y="34" font-size="26" font-weight="700" fill="#2dd4bf" text-anchor="middle">7</text>
+      <text x="88" y="56" font-size="14" fill="#8fa6c0" text-anchor="middle">subjects</text>
+    </g>
+    <g transform="translate(404 226)">
+      <rect width="176" height="72" rx="14" fill="#0f2033" stroke="#24425f" stroke-width="1.5"/>
+      <text x="88" y="34" font-size="26" font-weight="700" fill="#22d3ee" text-anchor="middle">163</text>
+      <text x="88" y="56" font-size="14" fill="#8fa6c0" text-anchor="middle">lessons</text>
+    </g>
+    <g transform="translate(596 226)">
+      <rect width="176" height="72" rx="14" fill="#0f2033" stroke="#24425f" stroke-width="1.5"/>
+      <text x="88" y="34" font-size="26" font-weight="700" fill="#a78bfa" text-anchor="middle">1–12</text>
+      <text x="88" y="56" font-size="14" fill="#8fa6c0" text-anchor="middle">school grades</text>
+    </g>
+    <g transform="translate(788 226)">
+      <rect width="176" height="72" rx="14" fill="#0f2033" stroke="#24425f" stroke-width="1.5"/>
+      <text x="88" y="34" font-size="26" font-weight="700" fill="#f0b429" text-anchor="middle">188</text>
+      <text x="88" y="56" font-size="14" fill="#8fa6c0" text-anchor="middle">tests, 0 deps</text>
+    </g>
+  </g>
+
+  <!-- decorative: a rising series, the app's own motif -->
+  <g opacity="0.5">
+    <circle cx="1010" cy="250" r="8" fill="#2dd4bf"/>
+    <circle cx="1054" cy="222" r="8" fill="#2dd4bf"/>
+    <circle cx="1098" cy="186" r="8" fill="#22d3ee"/>
+    <circle cx="1142" cy="142" r="8" fill="#22d3ee"/>
+    <path d="M1010 250 L1054 222 L1098 186 L1142 142" fill="none" stroke="#22d3ee"
+          stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6 5"/>
+  </g>
+</svg>
